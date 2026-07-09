@@ -11,13 +11,23 @@ CREATE TABLE compounds (
     name            VARCHAR(255) NOT NULL,
     smiles          TEXT NOT NULL,
     notes           TEXT,
-    tags            TEXT[] NOT NULL DEFAULT '{}',
     is_favorite     BOOLEAN NOT NULL DEFAULT false,
     created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
-CREATE INDEX idx_compounds_user_id ON compounds(user_id);
+CREATE TABLE tags (
+    id              SERIAL PRIMARY KEY,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name            VARCHAR(50) NOT NULL,
+    UNIQUE (user_id, name)
+);
 
--- QUERY BUAT UPDATE NOTES NANTI
--- UPDATE compounds SET content = $1, updated_at = NOW() WHERE id = $2;
+CREATE TABLE compound_tags (
+    compound_id     INTEGER NOT NULL REFERENCES compounds(id) ON DELETE CASCADE,
+    tag_id          INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+    PRIMARY KEY (compound_id, tag_id)
+);
+
+CREATE INDEX idx_compounds_user_id ON compounds(user_id);
+CREATE INDEX idx_compound_tags_tag_id ON compound_tags(tag_id);
