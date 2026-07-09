@@ -16,7 +16,7 @@ Ini project lanjutan setelah book tracker (React + Node/Express + PostgreSQL) da
 
 ## Filosofi Belajar (penting)
 
-- **Kode manual + minta dijelasin step-by-step** buat hal BARU: auth (hashing, JWT, middleware, protected routes), `useContext`/`useReducer`, query compounds yang terikat `user_id`, dan (nanti di v2) integrasi PubChem lewat backend + caching.
+- **Kode manual + minta dijelasin step-by-step** buat hal BARU: auth (hashing, JWT, middleware, protected routes), `useContext`/`useReducer`, query compounds yang terikat `user_id`, **query dengan JOIN** (many-to-many tags via join table — pola baru dari CRUD satu-tabel), dan (nanti di v2) integrasi PubChem lewat backend + caching.
 - **Boleh dipercepat/generate** buat hal yang udah dikuasai: boilerplate setup (Express skeleton, config Tailwind, koneksi PostgreSQL), styling, CRUD interaktivitas dasar yang polanya sama kayak book tracker.
 - Prinsip: pakai AI buat mempercepat hal yang udah dikuasai fundamentalnya, BUKAN buat ngeloncatin fundamental yang belum dipegang.
 
@@ -49,6 +49,12 @@ Ini project lanjutan setelah book tracker (React + Node/Express + PostgreSQL) da
   3. Bisa **cache hasil di Postgres** → senyawa yang sama nggak nembak PubChem berulang.
 - Pisahkan konsep: **render (SmilesDrawer) = client-side, nol API** vs **enrich (PubChem) = backend + cache**. Jangan ketuker.
 
+### Sistem tag (many-to-many)
+- Tag DISIMPAN ternormalisasi: tabel `tags` (satu baris per tag unik milik user) + tabel penghubung `compound_tags`. Satu compound bisa banyak tag, satu tag bisa dipakai banyak compound → relasi many-to-many.
+- Kenapa ternormalisasi, bukan kolom `TEXT[]`: karena target fiturnya **tag-picker ala Notion** — user ngetik, disaranin tag yang udah dia pakai, atau bikin baru. Pola ini butuh tag jadi entity nyata (biar ada sumber kebenaran tunggal, nggak ada duplikat typo kayak "aromatic"/"Aromatic"/"aromatik" numpuk jadi tag beda, dan bisa rename sekali-kena-semua).
+- Query saran tag (autocomplete prefix): `SELECT id, name FROM tags WHERE user_id = $1 AND name ILIKE $2 || '%'`.
+- Alur assign: user pilih tag yang disaranin → insert ke `compound_tags` pakai `tag_id` yang ada. User ngetik baru → insert ke `tags` dulu (`INSERT ... ON CONFLICT (user_id, name) DO NOTHING RETURNING id` biar aman), baru insert ke `compound_tags`.
+
 ### Markdown (field `notes`)
 - react-markdown itu renderer, bukan editor/uploader. Dia cuma render string markdown jadi HTML.
 - Dipakai buat field `notes` (catatan bebas per senyawa), bukan pusat app.
@@ -59,14 +65,17 @@ Ini project lanjutan setelah book tracker (React + Node/Express + PostgreSQL) da
 - Register & login (hash password pakai bcrypt, JWT)
 - Protected routes (halaman koleksi cuma bisa diakses kalau login)
 - CRUD compounds dasar: create, read, update, delete (terikat `user_id`)
-- Field per senyawa: `name`, `smiles`, `notes` (markdown), `tags`
+- Field per senyawa: `name`, `smiles`, `notes` (markdown), + tag
 - Render struktur 2D dari SMILES pakai **SmilesDrawer** (client-side)
 - Markdown rendering biasa (bold, italic, heading, list) buat `notes` pakai react-markdown
 - Fitur favorite (`is_favorite`)
+- **Tag: bikin & assign tag ke compound** (schema ternormalisasi + join table). Input tag versi sederhana dulu (ketik nama tag, assign).
 - Auth state pakai `useContext` + `useReducer`
 - **Deploy ke Render**
 
 ### v2 — setelah MVP live
+- **Tag-picker Notion-style**: autocomplete yang nyaranin tag user yang udah ada saat ngetik (query `ILIKE` prefix), pilih-atau-bikin-baru. Butuh form state lebih kompleks (multi-select + create-on-the-fly) → latihan `useReducer` lanjutan.
+  - *Catatan: penempatan v1-vs-v2 masih bisa digeser. Schema-nya udah siap buat dua-duanya; ini soal kapan UI autocomplete-nya dibangun.*
 - Enrichment PubChem lewat backend + cache Postgres (ketik nama/CID → auto-isi rumus, berat molekul, SMILES kanonik). Tambah kolom via `ALTER TABLE` (latihan migrasi).
 - Filter & search koleksi (by tag, by nama)
 - LaTeX / syntax highlighting di `notes` (opsional): `remark-math` + `rehype-katex`, `rehype-highlight`
@@ -80,42 +89,61 @@ Ini project lanjutan setelah book tracker (React + Node/Express + PostgreSQL) da
 ```sql
 -- Tabel users: nyimpen akun buat login (IDENTIK dengan notes app — auth domain-agnostic)
 CREATE TABLE users (
-    id            SERIAL PRIMARY KEY,
-    email         VARCHAR(255) UNIQUE NOT NULL,
-    password_hash VARCHAR(255) NOT NULL,
-    created_at    TIMESTAMP NOT NULL DEFAULT NOW()
+    id              SERIAL PRIMARY KEY,
+    email           VARCHAR(255) UNIQUE NOT NULL,
+    password_hash   VARCHAR(255) NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
 -- Tabel compounds: tiap senyawa terikat ke satu user
 CREATE TABLE compounds (
-    id          SERIAL PRIMARY KEY,
-    user_id     INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    name        VARCHAR(255) NOT NULL,
-    smiles      TEXT NOT NULL,
-    notes       TEXT,
-    tags        TEXT[] NOT NULL DEFAULT '{}',
-    is_favorite BOOLEAN NOT NULL DEFAULT false,
-    created_at  TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at  TIMESTAMP NOT NULL DEFAULT NOW()
+    id              SERIAL PRIMARY KEY,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name            VARCHAR(255) NOT NULL,
+    smiles          TEXT NOT NULL,
+    notes           TEXT,
+    is_favorite     BOOLEAN NOT NULL DEFAULT false,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Index buat mempercepat query "ambil compounds milik user tertentu"
+-- Tabel tags: satu baris per tag unik milik user
+CREATE TABLE tags (
+    id              SERIAL PRIMARY KEY,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name            VARCHAR(50) NOT NULL,
+    UNIQUE (user_id, name)
+);
+
+-- Tabel penghubung: relasi many-to-many compound <-> tag
+CREATE TABLE compound_tags (
+    compound_id     INTEGER NOT NULL REFERENCES compounds(id) ON DELETE CASCADE,
+    tag_id          INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+    PRIMARY KEY (compound_id, tag_id)
+);
+
 CREATE INDEX idx_compounds_user_id ON compounds(user_id);
+CREATE INDEX idx_compound_tags_tag_id ON compound_tags(tag_id);
 ```
 
 Catatan schema:
-- `users` harus dibuat DULUAN sebelum `compounds` (karena `compounds` REFERENCES `users`).
-- Relasi one-to-many: satu user punya banyak compounds, tiap compound satu pemilik (`user_id` foreign key).
-- `ON DELETE CASCADE`: hapus user → compounds-nya ikut kehapus.
+- **Urutan `CREATE TABLE` penting:** `users` → `compounds` → `tags` → `compound_tags`. Tabel yang di-REFERENCES harus ada duluan. `compound_tags` REFERENCES dua tabel (`compounds` + `tags`), jadi dia paling akhir.
+- `ON DELETE CASCADE` di mana-mana: hapus user → compounds, tags, dan baris compound_tags-nya ikut kehapus. Hapus compound/tag → baris di compound_tags ikut kehapus.
 - **`smiles` pakai `TEXT` bukan `VARCHAR(255)`** — SMILES molekul kompleks gampang lewat 255 karakter. `name` boleh VARCHAR(255) karena punya batas wajar.
-- **`content` (notes app) → pecah jadi `smiles` (mesin) + `notes` (manusia).** `smiles` NOT NULL (render adalah inti app); `notes` nullable.
-- **`tags TEXT[]`** dipilih daripada tabel `tags` + join table: cukup buat koleksi personal, sekalian belajar array Postgres. Filter: `WHERE 'aromatic' = ANY(tags)` atau `tags @> ARRAY['aromatic']`. Kalau nanti butuh agregasi tag lintas user / rename global → normalisasi ke tabel terpisah. Kalau filter tag sering dipakai → tambah GIN index: `CREATE INDEX idx_compounds_tags ON compounds USING GIN (tags);`
-- Kolom enrichment PubChem (`molecular_formula`, `molecular_weight`, `canonical_smiles`, `pubchem_cid`) SENGAJA belum ada di MVP — ditambah di v2 via `ALTER TABLE` (latihan migrasi).
+- **`content` (notes app) → pecah jadi `smiles` (mesin, NOT NULL, inti app) + `notes` (manusia, markdown, nullable).**
+- **`UNIQUE (user_id, name)` di `tags`** — user yang sama nggak bisa bikin tag "aromatic" dua kali. Ini yang bikin "sarankan tag yang udah ada" aman: database sendiri yang nyegah duplikat, bukan dicek manual di kode.
+- **Composite PK `(compound_id, tag_id)` di `compound_tags`** — yang bikin satu baris di tabel penghubung unik itu KOMBINASI compound+tag, bukan salah satunya. Efeknya: pasangan compound-X-tag-Y nggak bisa ke-insert dua kali (tag yang sama nggak nempel dobel ke satu compound). CATATAN: ini nggak nyegah compound bernama sama dibuat dua kali — itu constraint terpisah (`UNIQUE (user_id, name)` di `compounds`) kalau memang mau dilarang.
+- **Index & yang otomatis:**
+  - `idx_compounds_user_id` → query paling sering: "ambil compound milik user ini" (`WHERE user_id = $1`).
+  - `idx_compound_tags_tag_id` → arah "dari tag cari compound" (`WHERE tag_id = $1`). PK `(compound_id, tag_id)` udah otomatis bikin index buat arah sebaliknya (dari compound cari tag), tapi nggak buat arah ini.
+  - `PRIMARY KEY` dan `UNIQUE` OTOMATIS bikin index — jadi `users.email`, semua `id`, dan `UNIQUE (user_id, name)` di `tags` nggak perlu index manual lagi.
+  - Tradeoff index: bikin SELECT cepat, tapi INSERT/UPDATE/DELETE sedikit lebih lambat (index ikut di-update) + makan storage. Index kolom yang sering dipakai di WHERE/JOIN/ORDER BY, bukan asal semua.
 - `updated_at` TIDAK auto-update. `DEFAULT NOW()` cuma jalan saat INSERT. Pas UPDATE, set manual: `UPDATE compounds SET notes = $1, updated_at = NOW() WHERE id = $2 AND user_id = $3;` (catat `user_id` di WHERE — jangan sampai user bisa update senyawa milik orang lain).
 - Query ambil compounds user (favorite di atas): `SELECT * FROM compounds WHERE user_id = $1 ORDER BY is_favorite DESC, updated_at DESC;`
+- Kolom enrichment PubChem (`molecular_formula`, `molecular_weight`, `canonical_smiles`, `pubchem_cid`) SENGAJA belum ada di MVP — ditambah di v2 via `ALTER TABLE` (latihan migrasi).
 
 ## Langkah Berikutnya
 
 Sudah selesai: desain database (schema final di atas).
 
-**Berikutnya: auth flow.** Mulai dari konsep hashing password dulu (kenapa nggak boleh simpan password polos, gimana bcrypt kerja) SEBELUM nulis kode — biar paham *kenapa*-nya, bukan cuma *gimana*-nya. Lalu: JWT (token disimpan di mana, dikirim gimana, verify gimana), middleware auth di Express, protected routes di React, dan auth state pakai `useContext` + `useReducer` (handle state: loading / authenticated / unauthenticated + race condition saat cek login pertama kali).
+**Berikutnya: auth flow.** Mulai dari konsep hashing password dulu (kenapa nggak boleh simpan password polos, gimana bcrypt kerja — hashing, salt, kenapa lambat itu justru fitur) SEBELUM nulis kode — biar paham *kenapa*-nya, bukan cuma *gimana*-nya. Lalu: JWT (token disimpan di mana, dikirim gimana, verify gimana), middleware auth di Express, protected routes di React, dan auth state pakai `useContext` + `useReducer` (handle state: loading / authenticated / unauthenticated + race condition saat cek login pertama kali).
