@@ -144,6 +144,13 @@ Catatan schema:
 
 ## Langkah Berikutnya
 
-Sudah selesai: desain database (schema final di atas).
+Sudah selesai:
+- Desain database (schema final di atas).
+- **Konsep hashing password (SELESAI dipahami, belum ngoding).** Zidan udah paham secara konsep, nyampe sendiri lewat tanya-jawab (bukan hafalan): (1) kenapa nggak simpan password polos → simpan hasil **fungsi satu arah** (hash); (2) beda encoding vs encryption vs hashing (hashing = satu arah, nggak ada kunci/decrypt); (3) hash **deterministik** → login = bandingin abu-vs-abu, bukan password asli; (4) sisi gelap deterministik → **precomputation / rainbow table**; (5) **salt** (acak per user) mematikan precomputation; (6) salt **nggak rahasia** → disimpan terang-terangan; **bcrypt nyelipin salt di dalam string `password_hash`** makanya schema cukup 1 kolom; (7) **cost factor** (`$2b$12$...`) bikin lambat dengan sengaja → brute-force nggak ekonomis; (8) `bcrypt.compare(plaintext, hashDariDB)` cukup 2 argumen karena bcrypt motong salt+cost sendiri dari string; (9) **bcrypt nggak baca DB** — kodemu yang query DB, bcrypt cuma fungsi terima 2 string.
+- Konsep alur **register** (hash + insert, salt lahir di `bcrypt.hash`, nggak baca DB dulu) vs **login** (select `password_hash` dulu → `bcrypt.compare`) juga udah dibahas, plus detail keamanan: pesan error login harus generik (`"email atau password salah"`) buat nutup *user enumeration*.
 
-**Berikutnya: auth flow.** Mulai dari konsep hashing password dulu (kenapa nggak boleh simpan password polos, gimana bcrypt kerja — hashing, salt, kenapa lambat itu justru fitur) SEBELUM nulis kode — biar paham *kenapa*-nya, bukan cuma *gimana*-nya. Lalu: JWT (token disimpan di mana, dikirim gimana, verify gimana), middleware auth di Express, protected routes di React, dan auth state pakai `useContext` + `useReducer` (handle state: loading / authenticated / unauthenticated + race condition saat cek login pertama kali).
+**Berikutnya (belum dikerjain):**
+1. **Nulis kode `register` + `login` pakai bcrypt** (konsep udah matang, tinggal implementasi — Zidan lebih suka coba tulis sendiri dulu lalu direview, sesuai filosofi belajar).
+2. **JWT** (token disimpan di mana, dikirim gimana, verify gimana) — titik "nerbitin token" di akhir login adalah awal JWT.
+3. Middleware auth di Express, protected routes di React.
+4. Auth state pakai `useContext` + `useReducer` (handle state: loading / authenticated / unauthenticated + race condition saat cek login pertama kali).
