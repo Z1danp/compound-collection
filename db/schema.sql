@@ -1,5 +1,7 @@
 CREATE TABLE users (
     id              SERIAL PRIMARY KEY,
+    name            VARCHAR(255) NOT NULL,
+    is_guest        BOOLEAN NOT NULL DEFAULT false,
     email           VARCHAR(255) UNIQUE NOT NULL,
     password_hash   VARCHAR(255) NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT NOW()

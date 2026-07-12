@@ -97,12 +97,13 @@ Ini project lanjutan setelah book tracker (React + Node/Express + PostgreSQL) da
 -- Tabel users: nyimpen akun buat login (IDENTIK dengan notes app — auth domain-agnostic)
 CREATE TABLE users (
     id              SERIAL PRIMARY KEY,
+    name            VARCHAR(255) NOT NULL,
+    is_guest        BOOLEAN NOT NULL DEFAULT false,
     email           VARCHAR(255) UNIQUE NOT NULL,
     password_hash   VARCHAR(255) NOT NULL,
     created_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Tabel compounds: tiap senyawa terikat ke satu user
 CREATE TABLE compounds (
     id              SERIAL PRIMARY KEY,
     user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -114,7 +115,6 @@ CREATE TABLE compounds (
     updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
 );
 
--- Tabel tags: satu baris per tag unik milik user
 CREATE TABLE tags (
     id              SERIAL PRIMARY KEY,
     user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -122,7 +122,6 @@ CREATE TABLE tags (
     UNIQUE (user_id, name)
 );
 
--- Tabel penghubung: relasi many-to-many compound <-> tag
 CREATE TABLE compound_tags (
     compound_id     INTEGER NOT NULL REFERENCES compounds(id) ON DELETE CASCADE,
     tag_id          INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
