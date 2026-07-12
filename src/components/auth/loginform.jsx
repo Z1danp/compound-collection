@@ -31,7 +31,7 @@ function LoginForm() {
 
       {/* Body (flex-col) */}
       <div className="flex flex-col px-6 py-8 sm:px-8">
-        <h2 className="mb-6 text-2xl font-bold text-slate-800">Log In</h2>
+        <h2 className="mb-6 text-2xl font-bold text-slate-800">Sign In</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div>
