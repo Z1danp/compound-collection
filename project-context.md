@@ -25,6 +25,7 @@ Ini project lanjutan setelah book tracker (React + Node/Express + PostgreSQL) da
 ## Tech Stack
 
 - Frontend: **React (Vite)** — bukan Next.js (disimpan buat nanti setelah hooks dikuasai; app ini "app di balik login" jadi Vite lebih pas)
+- Routing: **React Router** (`react-router-dom`) — rute `/login`, `/register`, `/dashboard` (lihat catatan di bawah)
 - Backend: **Node/Express**
 - Database: **PostgreSQL**
 - Styling: **Tailwind CSS**
@@ -49,6 +50,11 @@ Ini project lanjutan setelah book tracker (React + Node/Express + PostgreSQL) da
   3. Bisa **cache hasil di Postgres** → senyawa yang sama nggak nembak PubChem berulang.
 - Pisahkan konsep: **render (SmilesDrawer) = client-side, nol API** vs **enrich (PubChem) = backend + cache**. Jangan ketuker.
 
+### Routing (React Router)
+- Keputusan: pakai `react-router-dom`, bukan toggle state manual, karena login/register mau punya URL kepisah (`/login` vs `/register`) — biar refresh nggak balik ke state awal, tombol back browser masuk akal, dan bisa share link register langsung. Rute: `/login`, `/register`, `/dashboard` (protected).
+- **Router ≠ pengganti Context/useReducer.** Router jawab "URL ini nampilin komponen apa", Context+useReducer jawab "status auth user sekarang gimana" (loading/authenticated/unauthenticated/error). Keduanya nyambung lewat `ProtectedRoute`: komponen ini punya router (dia yang decide render vs `<Navigate to="/login" />`), tapi keputusannya dibaca dari context.
+- **Sesuai filosofi belajar di atas: protected-route logic + AuthContext/useReducer TETAP dikode manual + dijelasin step-by-step, BUKAN digenerate.** Instalasi library & routing dasar (route table, komponen kosong) boleh di-scaffold duluan, tapi logic auth-nya nunggu sampai bcrypt/JWT/context selesai dipelajari (lihat "Langkah Berikutnya").
+
 ### Sistem tag (many-to-many)
 - Tag DISIMPAN ternormalisasi: tabel `tags` (satu baris per tag unik milik user) + tabel penghubung `compound_tags`. Satu compound bisa banyak tag, satu tag bisa dipakai banyak compound → relasi many-to-many.
 - Kenapa ternormalisasi, bukan kolom `TEXT[]`: karena target fiturnya **tag-picker ala Notion** — user ngetik, disaranin tag yang udah dia pakai, atau bikin baru. Pola ini butuh tag jadi entity nyata (biar ada sumber kebenaran tunggal, nggak ada duplikat typo kayak "aromatic"/"Aromatic"/"aromatik" numpuk jadi tag beda, dan bisa rename sekali-kena-semua).
@@ -63,7 +69,8 @@ Ini project lanjutan setelah book tracker (React + Node/Express + PostgreSQL) da
 
 ### MVP (v1) — target "selesai & bisa di-deploy"
 - Register & login (hash password pakai bcrypt, JWT)
-- Protected routes (halaman koleksi cuma bisa diakses kalau login)
+- Routing: `/login`, `/register`, `/dashboard` pakai React Router
+- Protected routes (halaman koleksi cuma bisa diakses kalau login) — `ProtectedRoute` baca status dari AuthContext
 - CRUD compounds dasar: create, read, update, delete (terikat `user_id`)
 - Field per senyawa: `name`, `smiles`, `notes` (markdown), + tag
 - Render struktur 2D dari SMILES pakai **SmilesDrawer** (client-side)
@@ -154,3 +161,4 @@ Sudah selesai:
 2. **JWT** (token disimpan di mana, dikirim gimana, verify gimana) — titik "nerbitin token" di akhir login adalah awal JWT.
 3. Middleware auth di Express, protected routes di React.
 4. Auth state pakai `useContext` + `useReducer` (handle state: loading / authenticated / unauthenticated + race condition saat cek login pertama kali).
+5. **Install & wire `react-router-dom`** (`/login`, `/register`, `/dashboard`) — boleh discaffold duluan (route table + komponen kosong), tapi `ProtectedRoute` yang baca AuthContext nunggu step 3-4 selesai, biar tetep dikode manual + dijelasin, bukan digenerate.
