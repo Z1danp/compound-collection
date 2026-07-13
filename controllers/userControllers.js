@@ -1,5 +1,7 @@
 import bcrypt from 'bcrypt';
 import pool from '../db/pool.js';
+import jwt from 'jsonwebtoken';
+import 'dotenv/config';
 
 const SALT_ROUNDS = 12;
 
@@ -37,7 +39,7 @@ export async function login(req, res) {
 
   try {
     const result = await pool.query(
-      'SELECT id, name, email, password_hash FROM users WHERE email=$1',
+      'SELECT id, name, email, password_hash, is_guest FROM users WHERE email=$1',
       [email]
     );
     const user = result.rows[0];
@@ -47,7 +49,27 @@ export async function login(req, res) {
     }
 
     // Generate JWT
-    res.json({ id: user.id, name: user.name, email: user.email });
+    const token = jwt.sign(
+      { userId: user.id, isGuest: user.is_guest },
+      process.env.JWT_SECRET,
+      { expireIn: '1h' }
+    );
+
+    res.cookie('token', token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 1000
+    }
+    )
+
+    res.json({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      is_guest: user.is_guest,
+    });
+    
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Terjadi kesalahan server' });
