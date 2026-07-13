@@ -32,4 +32,24 @@ export async function register(req, res) {
   }
 }
 
+export async function login(req, res) {
+  const { email, password } = req.body;
 
+  try {
+    const result = await pool.query(
+      'SELECT id, name, email, password_hash FROM users WHERE email=$1',
+      [email]
+    );
+    const user = result.rows[0];
+
+    if (!user || !(await bcrypt.compare(password, user.password_hash))) {
+      return res.status(401).json({ error: 'Email atau Password salah' });
+    }
+
+    // Generate JWT
+    res.json({ id: user.id, name: user.name, email: user.email });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Terjadi kesalahan server' });
+  }
+}
