@@ -1,4 +1,5 @@
 import LoginForm from "./components/auth/loginform";
+import RegistForm from "./components/auth/registform";
 
 function App() {
   return (
