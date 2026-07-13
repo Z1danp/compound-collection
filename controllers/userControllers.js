@@ -24,7 +24,7 @@ export async function register(req, res) {
 
     res.status(201).json({ user: result.rows[0] });
   } catch (err) {
-    if ((err.code = '23505')) {
+    if (err.code === '23505') {
       return res.status(409).json({ error: 'Email telah terdaftar' });
     }
     console.error(err);
