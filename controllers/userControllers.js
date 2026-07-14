@@ -52,7 +52,7 @@ export async function login(req, res) {
     const token = jwt.sign(
       { userId: user.id, isGuest: user.is_guest },
       process.env.JWT_SECRET,
-      { expireIn: '1h' }
+      { expiresIn: '1h' }
     );
 
     res.cookie('token', token, {
