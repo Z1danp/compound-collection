@@ -68,8 +68,8 @@ Ini project lanjutan setelah book tracker (React + Node/Express + PostgreSQL) da
 ## Scope Bertahap (MVP-first)
 
 ### MVP (v1) — target "selesai & bisa di-deploy"
-- Register & login (hash password pakai bcrypt, JWT)
-- Routing: `/login`, `/register`, `/dashboard` pakai React Router
+~~- Register & login (hash password pakai bcrypt, JWT)~~
+~~- Routing: `/login`, `/register`, `/dashboard` pakai React Router~~
 - Protected routes (halaman koleksi cuma bisa diakses kalau login) — `ProtectedRoute` baca status dari AuthContext
 - CRUD compounds dasar: create, read, update, delete (terikat `user_id`)
 - Field per senyawa: `name`, `smiles`, `notes` (markdown), + tag

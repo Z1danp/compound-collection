@@ -1,15 +1,27 @@
-import LoginForm from "./components/auth/loginform";
-import RegistForm from "./components/auth/registform";
-import AuthProvider  from "./components/auth/AuthContext";
+import LoginForm from './components/auth/loginform';
+import RegistForm from './components/auth/registform';
+import { AuthProvider } from './components/auth/AuthContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
+import { Route, BrowserRouter, Routes } from 'react-router-dom';
+import Collection from './components/collection/Collection';
 
 function App() {
   return (
     <AuthProvider>
-    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-slate-50 px-4 py-10">
-      <div className="relative w-full max-w-md">
-        <LoginForm />
-      </div>
-    </div>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<LoginForm />} />
+          <Route path="/regist" element={<RegistForm />} />
+          <Route
+            path="/collection"
+            element={
+              <ProtectedRoute>
+                <Collection />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
     </AuthProvider>
   );
 }

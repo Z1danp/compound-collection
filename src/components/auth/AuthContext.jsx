@@ -5,8 +5,22 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
 
-  function login(userData) {
-    ///
+  async function login({email, password}) {
+    const res = await fetch('http://localhost:3000/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      credentials: 'include',
+      body: JSON.stringify({email, password})
+    })
+
+    if(!res.ok) {
+      const data = await res.json()
+      throw new Error(data.error)
+    }
+
+    const data = await res.json()
+    setUser(data)
+    return data
   }
 
   function logout() {
@@ -14,7 +28,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={user, login, logout}>
+    <AuthContext.Provider value={{user, login, logout}}>
         {children}
     </AuthContext.Provider>
   )
