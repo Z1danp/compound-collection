@@ -31,7 +31,7 @@ function TagFilterDropdown({ selectedTags, onToggleTag }) {
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         aria-label="Filter tag"
-        className="flex bg-white items-center gap-1.5 border border-slate-200 rounded-full px-3 sm:px-4 py-2 text-sm font-medium text-slate-700 hover:shadow-md hover:border-slate-300 transition-colors font-['Plus_Jakarta_Sans']"
+        className="flex items-center gap-1.5 bg-white border border-slate-200 rounded-full px-3 sm:px-4 py-2 text-sm font-medium text-slate-700 hover:shadow-md hover:border-slate-300 transition-colors font-['Plus_Jakarta_Sans']"
       >
         <Filter className="w-4 h-4" />
         <span className="hidden sm:inline">Filter tag</span>
@@ -100,7 +100,7 @@ export default function FilterBar() {
   };
 
   return (
-    <div className="w-full flex items-start justify-between gap-4 px-6 py-4">
+    <div className="sticky top-15 z-20 w-full bg-slate-50 flex items-start justify-between gap-4 px-6 py-4 border-b border-slate-200">
       <div className="flex flex-wrap items-center gap-2">
         {selectedTags.map((tagId) => {
           const tag = DUMMY_TAGS.find((t) => t.id === tagId);

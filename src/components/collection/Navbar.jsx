@@ -5,7 +5,7 @@ export default function Navbar() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
-    <nav className="w-full bg-white border-b border-slate-200">
+    <nav className="sticky top-0 z-30 w-full bg-white border-b border-slate-200">
       {/* Main row — always visible */}
       <div className="flex items-center justify-between gap-4 px-4 sm:px-6 py-3">
         {/* Logo + Wordmark */}
