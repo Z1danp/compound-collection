@@ -80,7 +80,7 @@ export default function CompoundFormFields({
 
       <div className="mb-1.5 flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 py-10 px-10">
         {smiles.trim() ? (
-          <MoleculeFigure smiles={smiles} />
+          <MoleculeFigure smiles={onSmilesChange} />
         ) : (
           <>
             <svg

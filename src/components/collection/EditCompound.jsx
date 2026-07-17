@@ -55,7 +55,6 @@ export default function EditCompound({ compound, onClose, onSaveNotes, figure}) 
           tags={tags}
           onAddTag={handleAddTag}
           onRemoveTag={handleRemoveTag}
-          figure={figure}
         />
 
         {/* Right panel — notes. 2/3 width on desktop */}
