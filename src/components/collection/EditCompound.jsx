@@ -2,7 +2,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import CompoundFormFields from "./CompoundFormFields";
 
-export default function EditCompound({ compound, onClose, onSaveNotes }) {
+export default function EditCompound({ compound, onClose, onSaveNotes, figure}) {
   const [name, setName] = useState(compound?.name ?? "");
   const [smiles, setSmiles] = useState(compound?.smiles ?? "");
   const [tags, setTags] = useState(compound?.tags || []);
@@ -30,7 +30,7 @@ export default function EditCompound({ compound, onClose, onSaveNotes }) {
       onClick={handleClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl flex flex-col md:flex-row w-full md:w-[78vw] md:max-w-5xl max-h-[85vh] overflow-y-auto md:overflow-hidden"
+        className="bg-white rounded-2xl shadow-xl flex flex-col md:flex-row w-full md:w-[90vw] md:max-w-5xl max-h-[85vh] overflow-y-auto md:overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Mobile-only header — hidden on desktop, X lives in the notes panel instead */}
@@ -55,6 +55,7 @@ export default function EditCompound({ compound, onClose, onSaveNotes }) {
           tags={tags}
           onAddTag={handleAddTag}
           onRemoveTag={handleRemoveTag}
+          figure={figure}
         />
 
         {/* Right panel — notes. 2/3 width on desktop */}

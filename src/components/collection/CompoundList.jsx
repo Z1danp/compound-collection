@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Trash2 } from "lucide-react";
 import EditCompound from "./EditCompound";
+import SmilesDrawer from "smiles-drawer";
 
 // Placeholder molecule icon — swap with SmilesDrawer render later
 function MoleculePlaceholder() {
@@ -15,6 +16,22 @@ function MoleculePlaceholder() {
       <polygon points="50,15 80,32.5 80,67.5 50,85 20,67.5 20,32.5" />
     </svg>
   );
+}
+
+function MoleculeFigure({smiles}) {
+  const svgRef = useRef(null)
+
+  useEffect(() => {
+    if (!svgRef || !smiles) return;
+    const drawer = new SmilesDrawer.SmiDrawer({width: 550, height: 450})
+    drawer.draw(smiles, svgRef.current, 'light')
+  }, [smiles])
+
+  return (
+    <svg 
+    ref={svgRef}
+    style={{width:'25%', height:'auto', display:'flex'}}/>
+  )
 }
 
 function CompoundCard({ compound, onEdit, onDelete }) {
@@ -33,7 +50,7 @@ function CompoundCard({ compound, onEdit, onDelete }) {
       className="bg-white border border-slate-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-md hover:border-slate-300 transition-all"
     >
       <div className="flex items-center justify-center py-8 bg-white">
-        <MoleculePlaceholder />
+        <MoleculeFigure smiles={compound.smiles} />
       </div>
 
       <div className="border-t border-slate-100" />
@@ -102,6 +119,7 @@ export default function CardList({ compounds }) {
           compound={editingCompound}
           onClose={handleCloseModal}
           onSaveNotes={handleSaveNotes}
+          figure={MoleculeFigure}
         />
       )}
     </>

@@ -44,9 +44,9 @@ const DUMMY_COMPOUNDS = [
   },
   {
     id: 6,
-    name: "Glisin",
-    smiles: "NCC(=O)O",
-    tags: ["Amine"],
+    name: "Taurocholic Acid",
+    smiles: "CS(=O)(=O)CCNC(=O)CCC[C@H](C)[C@H]1CC[C@@H]2[C@@]1([C@H](C[C@H]3[C@H]2[C@@H](C[C@H]4[C@@]3(CC[C@H](C4)O)C)O)O)C",
+    tags: ["Cholic Acid"],
     notes: "",
   },
 ];
