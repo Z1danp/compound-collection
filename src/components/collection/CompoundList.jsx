@@ -2,53 +2,6 @@ import { useState } from "react";
 import { Trash2 } from "lucide-react";
 import EditCompound from "./EditCompound";
 
-// Dummy data — replace with real compound data from API later
-const DUMMY_COMPOUNDS = [
-  {
-    id: 1,
-    name: "Benzena",
-    smiles: "c1ccccc1",
-    tags: ["Aromatic", "Cyclic", "Pelarut", "Toksik"],
-    notes:
-      "Pelarut nonpolar, titik didih 80,1 °C. Jangan pakai untuk ekstraksi sampel B — residu susah hilang.\n\nCek ulang hasil uji nyala minggu depan; bandingkan dengan toluena.",
-  },
-  {
-    id: 2,
-    name: "Toluena",
-    smiles: "Cc1ccccc1",
-    tags: ["Aromatic"],
-    notes: "",
-  },
-  {
-    id: 3,
-    name: "Fenol",
-    smiles: "Oc1ccccc1",
-    tags: ["Aromatic"],
-    notes: "",
-  },
-  {
-    id: 4,
-    name: "Anilina",
-    smiles: "Nc1ccccc1",
-    tags: ["Aromatic"],
-    notes: "",
-  },
-  {
-    id: 5,
-    name: "Metana",
-    smiles: "C",
-    tags: ["Alkane"],
-    notes: "",
-  },
-  {
-    id: 6,
-    name: "Glisin",
-    smiles: "NCC(=O)O",
-    tags: ["Amine"],
-    notes: "",
-  },
-];
-
 // Placeholder molecule icon — swap with SmilesDrawer render later
 function MoleculePlaceholder() {
   return (
@@ -110,7 +63,7 @@ function CompoundCard({ compound, onEdit, onDelete }) {
   );
 }
 
-export default function CardList() {
+export default function CardList({ compounds }) {
   const [editingCompound, setEditingCompound] = useState(null);
 
   const handleEdit = (compound) => {
@@ -134,7 +87,7 @@ export default function CardList() {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
-        {DUMMY_COMPOUNDS.map((compound) => (
+        {compounds.map((compound) => (
           <CompoundCard
             key={compound.id}
             compound={compound}

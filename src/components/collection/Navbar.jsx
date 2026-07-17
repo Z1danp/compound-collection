@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, Plus, LogOut, X } from "lucide-react";
 
-export default function Navbar() {
+export default function Navbar({ onAddClick }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
@@ -49,6 +49,7 @@ export default function Navbar() {
 
           {/* Tambah senyawa — icon-only below sm */}
           <button
+            onClick={onAddClick}
             aria-label="Tambah senyawa"
             className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 transition-colors text-white text-sm font-medium rounded-full px-3 sm:px-4 py-2 font-['Plus_Jakarta_Sans']"
           >
