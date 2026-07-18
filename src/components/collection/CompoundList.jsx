@@ -3,21 +3,6 @@ import { Trash2 } from "lucide-react";
 import EditCompound from "./EditCompound";
 import SmilesDrawer from "smiles-drawer";
 
-// Placeholder molecule icon — swap with SmilesDrawer render later
-function MoleculePlaceholder() {
-  return (
-    <svg
-      viewBox="0 0 100 100"
-      className="w-20 h-20 text-slate-700"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <polygon points="50,15 80,32.5 80,67.5 50,85 20,67.5 20,32.5" />
-    </svg>
-  );
-}
-
 function MoleculeFigure({smiles}) {
   const svgRef = useRef(null)
 

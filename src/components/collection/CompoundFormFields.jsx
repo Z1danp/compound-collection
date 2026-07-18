@@ -2,21 +2,6 @@ import { useState, useRef, useEffect } from 'react';
 import { RefreshCw, X } from 'lucide-react';
 import SmilesDrawer from 'smiles-drawer';
 
-// Placeholder molecule icon — swap with SmilesDrawer render later
-function MoleculePlaceholder() {
-  return (
-    <svg
-      viewBox="0 0 100 100"
-      className="h-24 w-24 text-slate-700"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <polygon points="50,15 80,32.5 80,67.5 50,85 20,67.5 20,32.5" />
-    </svg>
-  );
-}
-
 function MoleculeFigure({ smiles }) {
   const svgRef = useRef(null);
 
@@ -34,7 +19,7 @@ function MoleculeFigure({ smiles }) {
         width: '100%',
         height: 'auto',
         display: 'block',
-        overflow: 'visible'
+        overflow: 'visible',
       }}
     />
   );
@@ -78,9 +63,9 @@ export default function CompoundFormFields({
         </button>
       </div>
 
-      <div className="mb-1.5 flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 py-10 px-10">
+      <div className="mb-1.5 flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 px-10 py-10">
         {smiles.trim() ? (
-          <MoleculeFigure smiles={onSmilesChange} />
+          <MoleculeFigure smiles={smiles} />
         ) : (
           <>
             <svg

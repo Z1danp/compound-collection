@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Caffeine from '../icons/Caffeine';
 import { useAuth } from './AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -8,12 +9,15 @@ function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
+
     try {
       await login({ email, password });
+      navigate('/');
     } catch (error) {
       setError(error.message);
     }
@@ -144,7 +148,10 @@ function LoginForm() {
 
             <p className="mt-6 text-center text-sm text-slate-500">
               Don't have an account yet?{' '}
-              <a href="#" className="font-bold text-blue-700 hover:underline">
+              <a
+                href="\regist"
+                className="font-bold text-blue-700 hover:underline"
+              >
                 Sign Up
               </a>
             </p>

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Caffeine from '../icons/Caffeine';
+import { useNavigate } from 'react-router-dom';
 
 function RegistForm() {
   const [name, setName] = useState('');
@@ -7,11 +8,26 @@ function RegistForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate()
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
-    console.log('Login attempt:', { email, password }); // dummy
-    // nanti: validasi + setError("Email atau password salah")
+    try {
+      const req = await fetch('http://localhost:3000/regist', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          name,
+          email,
+          password
+        })
+      })
+      if (req.ok) {
+        navigate('/')
+      }
+    } catch(err) {
+      setError(err.message)
+    }
   }
 
   return (

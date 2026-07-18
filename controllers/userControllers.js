@@ -34,6 +34,25 @@ export async function register(req, res) {
   }
 }
 
+export async function getMe(req, res) {
+  try {
+    const result = await pool.query(
+      'SELECT id, name, email, is_guest FROM users WHERE id = $1',
+      [req.user.userId]
+    );
+    const user = result.rows[0];
+
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    res.json(user);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Terjadi kesalahan server' });
+  }
+}
+
 export async function login(req, res) {
   const { email, password } = req.body;
 

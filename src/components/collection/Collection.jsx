@@ -55,6 +55,8 @@ function Collection () {
     const [compounds, setCompounds] = useState(DUMMY_COMPOUNDS);
     const [isAddOpen, setIsAddOpen] = useState(false);
 
+    
+
     const handleAddCompound = (newCompound) => {
         setCompounds((prev) => [...prev, { id: Date.now(), ...newCompound }]);
     };

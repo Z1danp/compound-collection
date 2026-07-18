@@ -8,7 +8,7 @@ import Collection from './components/collection/Collection';
 function App() {
   return (
     <AuthProvider>
-      {/* <BrowserRouter>
+      <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginForm />} />
           <Route path="/regist" element={<RegistForm />} />
@@ -21,8 +21,7 @@ function App() {
             }
           />
         </Routes>
-      </BrowserRouter> */}
-      <Collection />
+      </BrowserRouter>
     </AuthProvider>
   );
 }
