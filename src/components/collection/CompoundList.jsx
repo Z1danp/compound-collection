@@ -50,7 +50,7 @@ function CompoundCard({ compound, onEdit, onDelete }) {
 
         <div className="flex items-center justify-between mt-3">
           <span className="bg-amber-100 text-amber-800 text-xs font-medium rounded-full px-3 py-1 font-['Plus_Jakarta_Sans']">
-            {compound.tags[0]}
+            {compound.tags}
           </span>
           <button
             onClick={handleDeleteClick}
@@ -65,7 +65,7 @@ function CompoundCard({ compound, onEdit, onDelete }) {
   );
 }
 
-export default function CardList({ compounds }) {
+export default function CardList({ compounds, tags, compoundTags }) {
   const [editingCompound, setEditingCompound] = useState(null);
 
   const handleEdit = (compound) => {

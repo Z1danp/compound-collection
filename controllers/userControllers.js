@@ -57,12 +57,13 @@ export async function login(req, res) {
   const { email, password } = req.body;
 
   try {
+    // query user ke db
     const result = await pool.query(
       'SELECT id, name, email, password_hash, is_guest FROM users WHERE email=$1',
       [email]
     );
     const user = result.rows[0];
-
+    // validation kalo user ga ketemu di db
     if (!user || !(await bcrypt.compare(password, user.password_hash))) {
       return res.status(401).json({ error: 'Email atau Password salah' });
     }
@@ -73,22 +74,20 @@ export async function login(req, res) {
       process.env.JWT_SECRET,
       { expiresIn: '1h' }
     );
-
+    // kirim jwt ke cookie browser
     res.cookie('token', token, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 60 * 60 * 1000
-    }
-    )
-
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 1000,
+    });
+// kirim info user setelah sukses login
     res.json({
       id: user.id,
       name: user.name,
       email: user.email,
       is_guest: user.is_guest,
     });
-    
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: 'Terjadi kesalahan server' });
