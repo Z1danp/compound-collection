@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import CompoundList from './CompoundList';
+import CardList from './CompoundList';
 import FilterBar from './Filterbar';
 import Navbar from './NavBar';
 import AddCompound from './AddCompound';
@@ -142,10 +142,11 @@ function Collection() {
     <div className="bg-slate-50">
       <Navbar onAddClick={() => setIsAddOpen(true)} />
       <FilterBar />
-      <CompoundList
+      <CardList
         compounds={compoundsWithTags}
         tags={tagNameById}
         compoundTags={compoundsWithTags}
+        fetching = {fetchCompounds}
       />
       {isAddOpen && (
         <AddCompound

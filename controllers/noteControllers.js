@@ -71,6 +71,23 @@ export async function addCompound(req, res) {
   }
 }
 
+export async function deleteCompound(req, res) {
+  try {
+    const compoundsResult = await pool.query(
+      `DELETE FROM compounds
+      WHERE id = $1 AND user_id = $2
+      RETURNING *`,
+      [req.body.id, req.user.userId]
+    );
+
+    res.status(200).json({
+      compoundsResult,
+    });
+  } catch (err) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
 export async function getUserData(req, res) {
   try {
     const compoundsResult = await pool.query(

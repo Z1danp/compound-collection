@@ -70,7 +70,7 @@ function CompoundCard({ compound, onEdit, onDelete }) {
   );
 }
 
-export default function CardList({ compounds, tags, compoundTags }) {
+export default function CardList({ compounds, tags, compoundTags, fetching}) {
   const [editingCompound, setEditingCompound] = useState(null);
 
   const handleEdit = (compound) => {
@@ -86,9 +86,21 @@ export default function CardList({ compounds, tags, compoundTags }) {
     console.log(`Auto-save notes for compound ${compoundId}:`, notes);
   };
 
-  const handleDelete = (compound) => {
-    // Dummy for now — will call delete API later
-    alert(`Hapus senyawa: ${compound.name}`);
+  const handleDelete = async (compound) => {
+    try {
+      console.log(compound.id)
+      const req = await fetch('http://localhost:3000/api/compounds', {
+        method:'DELETE',
+        credentials: 'include',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({"id": `${compound.id}`})
+      })
+      const res = await req.json()
+      console.log()
+    } catch (err) {
+      console.error(err)
+    }
+    fetching()
   };
 
   return (
