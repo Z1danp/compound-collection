@@ -1,22 +1,23 @@
-import { useState, useRef, useEffect } from "react";
-import { Trash2 } from "lucide-react";
-import EditCompound from "./EditCompound";
-import SmilesDrawer from "smiles-drawer";
+import { useState, useRef, useEffect } from 'react';
+import { Trash2 } from 'lucide-react';
+import EditCompound from './EditCompound';
+import SmilesDrawer from 'smiles-drawer';
 
-function MoleculeFigure({smiles}) {
-  const svgRef = useRef(null)
+function MoleculeFigure({ smiles }) {
+  const svgRef = useRef(null);
 
   useEffect(() => {
     if (!svgRef || !smiles) return;
-    const drawer = new SmilesDrawer.SmiDrawer({width: 550, height: 450})
-    drawer.draw(smiles, svgRef.current, 'light')
-  }, [smiles])
+    const drawer = new SmilesDrawer.SmiDrawer({ width: 550, height: 450 });
+    drawer.draw(smiles, svgRef.current, 'light');
+  }, [smiles]);
 
   return (
-    <svg 
-    ref={svgRef}
-    style={{width:'25%', height:'auto', display:'flex'}}/>
-  )
+    <svg
+      ref={svgRef}
+      style={{ width: '25%', height: 'auto', display: 'flex' }}
+    />
+  );
 }
 
 function CompoundCard({ compound, onEdit, onDelete }) {
@@ -32,32 +33,36 @@ function CompoundCard({ compound, onEdit, onDelete }) {
   return (
     <div
       onClick={handleCardClick}
-      className="bg-white border border-slate-200 rounded-2xl overflow-hidden cursor-pointer hover:shadow-md hover:border-slate-300 transition-all"
+      className="cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:border-slate-300 hover:shadow-md"
     >
-      <div className="flex items-center justify-center py-8 bg-white">
+      <div className="flex items-center justify-center bg-white py-8">
         <MoleculeFigure smiles={compound.smiles} />
       </div>
 
       <div className="border-t border-slate-100" />
 
       <div className="p-4">
-        <h3 className="font-semibold text-slate-900 text-base font-['Space_Grotesk']">
+        <h3 className="font-['Space_Grotesk'] text-base font-semibold text-slate-900">
           {compound.name}
         </h3>
-        <p className="text-sm text-slate-400 font-mono mt-0.5">
+        <p className="mt-0.5 font-mono truncate text-sm text-slate-400">
           {compound.smiles}
         </p>
 
-        <div className="flex items-center justify-between mt-3">
-          <span className="bg-amber-100 text-amber-800 text-xs font-medium rounded-full px-3 py-1 font-['Plus_Jakarta_Sans']">
-            {compound.tags}
-          </span>
+        <div className="mt-3 flex items-center justify-between">
+          <div className="flex flex-wrap gap-1.5">
+            {compound.tags.map((tagName) => (
+              <span key={tagName} className="rounded-full bg-amber-100 px-3 py-1 font-['Plus_Jakarta_Sans'] text-xs font-medium text-amber-800">
+                {tagName}
+              </span>
+            ))}
+          </div>
           <button
             onClick={handleDeleteClick}
             aria-label={`Hapus ${compound.name}`}
-            className="text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg p-1.5 transition-colors"
+            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600"
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="h-4 w-4" />
           </button>
         </div>
       </div>
@@ -88,7 +93,7 @@ export default function CardList({ compounds, tags, compoundTags }) {
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+      <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
         {compounds.map((compound) => (
           <CompoundCard
             key={compound.id}

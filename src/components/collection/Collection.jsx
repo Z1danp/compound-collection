@@ -54,8 +54,8 @@ const DUMMY_COMPOUNDS = [
 
 function Collection() {
   const [compounds, setCompounds] = useState(DUMMY_COMPOUNDS);
-  const [tags, setTags] = useState(null);
-  const [compoundTags, setCompoundTags] = useState(null);
+  const [tags, setTags] = useState([]);
+  const [compoundTags, setCompoundTags] = useState([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const abortControllerRef = useRef(null);
 
@@ -102,8 +102,29 @@ function Collection() {
     tagIdsByCompoundId[ct.compound_id].push(ct.tag_id);
   }
 
-  const handleAddCompound = (newCompound) => {
-    setCompounds((prev) => [...prev, { id: Date.now(), ...newCompound }]);
+  const handleAddCompound = async (newCompound) => {
+    try {
+      const req = await fetch('http://localhost:3000/api/compounds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          compound: {
+            name: newCompound.name,
+            smiles: newCompound.smiles,
+            notes: newCompound.notes,
+            is_favorit: false,
+          },
+          tags: newCompound.tags,
+        }),
+      });
+      const saved = await req.json();
+      setCompounds((prev) => [...prev, saved.compound]);
+      setTags((prev) => [...prev, saved.tags]);
+      setCompoundTags((prev) => [...prev, saved.compoundTags]);
+    } catch (err) {
+      console.error({ message: err });
+    }
   };
 
   // Gabung ke compounds
@@ -111,7 +132,7 @@ function Collection() {
     const tagIds = tagIdsByCompoundId[compound.id] || [];
 
     const tagNames = tagIds.map((tagId) => {
-      tagNameById[tagId];
+      return tagNameById[tagId];
     });
 
     return { ...compound, tags: tagNames };
@@ -122,9 +143,9 @@ function Collection() {
       <Navbar onAddClick={() => setIsAddOpen(true)} />
       <FilterBar />
       <CompoundList
-        compounds={compounds}
-        tags={tags}
-        compoundTags={compoundTags}
+        compounds={compoundsWithTags}
+        tags={tagNameById}
+        compoundTags={compoundsWithTags}
       />
       {isAddOpen && (
         <AddCompound

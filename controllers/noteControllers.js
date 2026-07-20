@@ -1,5 +1,76 @@
 import pool from '../db/pool.js';
 
+export async function addCompound(req, res) {
+  const { compound, tags = [] } = req.body;
+  const userId = req.user.userId;
+
+  if (!compound?.name?.trim() || !compound?.smiles?.trim()) {
+    return res.status(400).json({ error: 'Nama dan SMILES wajib diisi' });
+  }
+
+  const client = await pool.connect();
+
+  try {
+    await client.query('BEGIN');
+
+    const compoundResult = await client.query(
+      `INSERT INTO compounds (user_id, name, smiles, notes, is_favorite)
+       VALUES ($1, $2, $3, $4, $5)
+       RETURNING id, name, smiles, notes, is_favorite, created_at, updated_at`,
+      [
+        userId,
+        compound.name.trim(),
+        compound.smiles.trim(),
+        compound.notes ?? null,
+        compound.is_favorite ?? false,
+      ]
+    );
+    const newCompound = compoundResult.rows[0];
+
+    const tagRows = [];
+    const compoundTagRows = [];
+
+    for (const rawTagName of tags) {
+      const tagName = rawTagName.trim();
+      // handling array tag yang '' bisa langsung skip aja ke tag lain
+      if (!tagName) continue;
+
+      // upsert: kalau tag dengan nama itu udah ada milik user ini, pakai id-nya
+      const tagResult = await client.query(
+        `INSERT INTO tags (user_id, name)
+         VALUES ($1, $2)
+         ON CONFLICT (user_id, name) DO UPDATE SET name = EXCLUDED.name
+         RETURNING id, name`,
+        [userId, tagName]
+      );
+      const tag = tagResult.rows[0];
+      tagRows.push(tag);
+
+      const compoundTagResult = await client.query(
+        `INSERT INTO compound_tags (compound_id, tag_id)
+         VALUES ($1, $2)
+         RETURNING compound_id, tag_id`,
+        [newCompound.id, tag.id]
+      );
+      compoundTagRows.push(compoundTagResult.rows[0]);
+    }
+
+    await client.query('COMMIT');
+
+    res.status(201).json({
+      compound: newCompound,
+      tags: tagRows,
+      compoundTags: compoundTagRows,
+    });
+  } catch (err) {
+    await client.query('ROLLBACK');
+    console.error('addCompound:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  } finally {
+    client.release();
+  }
+}
+
 export async function getUserData(req, res) {
   try {
     const compoundsResult = await pool.query(
