@@ -4,58 +4,11 @@ import FilterBar from './Filterbar';
 import Navbar from './NavBar';
 import AddCompound from './AddCompound';
 
-// Dummy data — replace with real compound data from API later
-const DUMMY_COMPOUNDS = [
-  {
-    id: 1,
-    name: 'Benzena',
-    smiles: 'c1ccccc1',
-    tags: ['Aromatic', 'Cyclic', 'Pelarut', 'Toksik'],
-    notes:
-      'Pelarut nonpolar, titik didih 80,1 °C. Jangan pakai untuk ekstraksi sampel B — residu susah hilang.\n\nCek ulang hasil uji nyala minggu depan; bandingkan dengan toluena.',
-  },
-  {
-    id: 2,
-    name: 'Toluena',
-    smiles: 'Cc1ccccc1',
-    tags: ['Aromatic'],
-    notes: '',
-  },
-  {
-    id: 3,
-    name: 'Fenol',
-    smiles: 'Oc1ccccc1',
-    tags: ['Aromatic'],
-    notes: '',
-  },
-  {
-    id: 4,
-    name: 'Anilina',
-    smiles: 'Nc1ccccc1',
-    tags: ['Aromatic'],
-    notes: '',
-  },
-  {
-    id: 5,
-    name: 'Metana',
-    smiles: 'C',
-    tags: ['Alkane'],
-    notes: '',
-  },
-  {
-    id: 6,
-    name: 'Taurocholic Acid',
-    smiles:
-      'CS(=O)(=O)CCNC(=O)CCC[C@H](C)[C@H]1CC[C@@H]2[C@@]1([C@H](C[C@H]3[C@H]2[C@@H](C[C@H]4[C@@]3(CC[C@H](C4)O)C)O)O)C',
-    tags: ['Cholic Acid'],
-    notes: '',
-  },
-];
-
 function Collection() {
-  const [compounds, setCompounds] = useState(DUMMY_COMPOUNDS);
+  const [compounds, setCompounds] = useState([]);
   const [tags, setTags] = useState([]);
   const [compoundTags, setCompoundTags] = useState([]);
+   const [selectedTags, setSelectedTags] = useState([]);
   const [isAddOpen, setIsAddOpen] = useState(false);
   const abortControllerRef = useRef(null);
 
@@ -138,15 +91,26 @@ function Collection() {
     return { ...compound, tags: tagNames };
   });
 
+  // Filter Compund
+  const filteredCompounds =
+    selectedTags.length === 0
+      ? compoundsWithTags
+      : compoundsWithTags.filter((c) =>
+          selectedTags.every((tagId) => c.tags.includes(tagNameById[tagId]))
+        );
   return (
-    <div className="bg-slate-50">
+     <div>
       <Navbar onAddClick={() => setIsAddOpen(true)} />
-      <FilterBar />
+      <FilterBar
+        tags={tags}
+        selectedTags={selectedTags}
+        onTagsChange={setSelectedTags}
+      />
       <CardList
-        compounds={compoundsWithTags}
+        compounds={filteredCompounds}     // <-- ganti jadi filtered
         tags={tagNameById}
         compoundTags={compoundsWithTags}
-        fetching = {fetchCompounds}
+        fetching={fetchCompounds}
       />
       {isAddOpen && (
         <AddCompound
