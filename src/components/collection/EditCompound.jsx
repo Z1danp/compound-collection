@@ -7,6 +7,7 @@ export default function EditCompound({
   onClose,
   onSaveNotes,
   figure,
+  allTags,
 }) {
   const [name, setName] = useState(compound?.name ?? '');
   const [smiles, setSmiles] = useState(compound?.smiles ?? '');
@@ -74,6 +75,7 @@ export default function EditCompound({
           tags={tags}
           onAddTag={handleAddTag}
           onRemoveTag={handleRemoveTag}
+          allTags={allTags}
         />
 
         {/* Right panel — notes. 2/3 width on desktop */}

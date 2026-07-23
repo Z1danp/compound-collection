@@ -34,16 +34,45 @@ export default function CompoundFormFields({
   tags,
   onAddTag,
   onRemoveTag,
+  allTags = [],
 }) {
   const [tagInput, setTagInput] = useState('');
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = useRef(null);
+
+  const suggestions = tagInput.trim()
+    ? allTags.filter(
+        (t) =>
+          t.toLowerCase().includes(tagInput.trim().toLowerCase()) &&
+          !tags.includes(t)
+      )
+    : [];
 
   const handleAddTag = (e) => {
     if (e.key === 'Enter' && tagInput.trim()) {
       e.preventDefault();
       onAddTag(tagInput.trim());
       setTagInput('');
+      setShowSuggestions(false);
     }
   };
+
+  const handleSelectSuggestion = (tag) => {
+    onAddTag(tag);
+    setTagInput('');
+    setShowSuggestions(false);
+  };
+
+  const hasSuggestions = showSuggestions && suggestions.length > 0;
+
+  useEffect(() => {
+    if (hasSuggestions) {
+      suggestionsRef.current?.scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth',
+      });
+    }
+  }, [hasSuggestions]);
 
   return (
     <div className="border-b border-slate-200 p-6 md:w-1/2 md:overflow-y-auto md:border-r md:border-b-0">
@@ -101,14 +130,39 @@ export default function CompoundFormFields({
       <label className="mb-1.5 block font-['Plus_Jakarta_Sans'] text-sm font-semibold text-slate-900">
         Tag
       </label>
-      <input
-        type="text"
-        value={tagInput}
-        onChange={(e) => setTagInput(e.target.value)}
-        onKeyDown={handleAddTag}
-        placeholder="Tambah tag — tekan Enter"
-        className="mb-3 w-full rounded-lg border border-slate-200 px-3 py-2 font-['Plus_Jakarta_Sans'] text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
-      />
+      <div className="relative mb-3">
+        <input
+          type="text"
+          value={tagInput}
+          onChange={(e) => {
+            setTagInput(e.target.value);
+            setShowSuggestions(true);
+          }}
+          onKeyDown={handleAddTag}
+          onFocus={() => setShowSuggestions(true)}
+          onBlur={() => setShowSuggestions(false)}
+          placeholder="Tambah tag — tekan Enter"
+          className="w-full rounded-lg border border-slate-200 px-3 py-2 font-['Plus_Jakarta_Sans'] text-sm text-slate-700 placeholder:text-slate-400 focus:ring-2 focus:ring-blue-500 focus:outline-none"
+        />
+        {hasSuggestions && (
+          <div
+            ref={suggestionsRef}
+            className="absolute z-10 mt-1 max-h-40 w-full overflow-y-auto rounded-lg border border-slate-200 bg-white shadow-lg"
+          >
+            {suggestions.map((tag) => (
+              <button
+                key={tag}
+                type="button"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => handleSelectSuggestion(tag)}
+                className="block w-full px-3 py-2 text-left font-['Plus_Jakarta_Sans'] text-sm text-slate-700 hover:bg-slate-50"
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
 
       <div className="flex flex-wrap gap-2">
         {tags.map((tag) => (

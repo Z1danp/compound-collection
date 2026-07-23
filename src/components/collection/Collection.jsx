@@ -111,11 +111,13 @@ function Collection() {
         tags={tagNameById}
         compoundTags={compoundsWithTags}
         fetching={fetchCompounds}
+        allTags={tags.map((t) => t.name)}
       />
       {isAddOpen && (
         <AddCompound
           onClose={() => setIsAddOpen(false)}
           onAdd={handleAddCompound}
+          allTags={tags.map((t) => t.name)}
         />
       )}
     </div>

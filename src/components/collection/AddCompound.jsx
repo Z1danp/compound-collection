@@ -2,7 +2,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import CompoundFormFields from "./CompoundFormFields";
 
-export default function AddCompound({ onClose, onAdd }) {
+export default function AddCompound({ onClose, onAdd, allTags }) {
   const [name, setName] = useState("");
   const [smiles, setSmiles] = useState("");
   const [tags, setTags] = useState([]);
@@ -38,6 +38,7 @@ export default function AddCompound({ onClose, onAdd }) {
           tags={tags}
           onAddTag={handleAddTag}
           onRemoveTag={handleRemoveTag}
+          allTags={allTags}
         />
 
         {/* Right panel — notes (optional) + submit. 2/3 width on desktop */}

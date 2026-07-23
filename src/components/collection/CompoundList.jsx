@@ -73,7 +73,13 @@ function CompoundCard({ compound, onEdit, onDelete }) {
   );
 }
 
-export default function CardList({ compounds, tags, compoundTags, fetching }) {
+export default function CardList({
+  compounds,
+  tags,
+  compoundTags,
+  fetching,
+  allTags,
+}) {
   const [editingCompound, setEditingCompound] = useState(null);
 
   const handleEdit = (compound) => {
@@ -144,6 +150,7 @@ export default function CardList({ compounds, tags, compoundTags, fetching }) {
           onClose={handleCloseModal}
           onSaveNotes={handleSaveNotes}
           figure={MoleculeFigure}
+          allTags={allTags}
         />
       )}
     </>
