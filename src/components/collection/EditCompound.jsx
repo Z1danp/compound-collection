@@ -1,12 +1,17 @@
-import { useState } from "react";
-import { X } from "lucide-react";
-import CompoundFormFields from "./CompoundFormFields";
+import { useState } from 'react';
+import { X } from 'lucide-react';
+import CompoundFormFields from './CompoundFormFields';
 
-export default function EditCompound({ compound, onClose, onSaveNotes, figure}) {
-  const [name, setName] = useState(compound?.name ?? "");
-  const [smiles, setSmiles] = useState(compound?.smiles ?? "");
+export default function EditCompound({
+  compound,
+  onClose,
+  onSaveNotes,
+  figure,
+}) {
+  const [name, setName] = useState(compound?.name ?? '');
+  const [smiles, setSmiles] = useState(compound?.smiles ?? '');
   const [tags, setTags] = useState(compound?.tags || []);
-  const [notes, setNotes] = useState(compound?.notes || "");
+  const [notes, setNotes] = useState(compound?.notes || '');
 
   if (!compound) return null;
 
@@ -14,35 +19,49 @@ export default function EditCompound({ compound, onClose, onSaveNotes, figure}) 
     setTags((prev) => [...prev, tag]);
   };
 
-  const handleRemoveTag = (tagToRemove) => {
+  const handleRemoveTag = async (tagToRemove) => {
+    try {
+      const req = await fetch('http://localhost:3000/api/compounds/tags', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          compound: compound,
+          tag: tagToRemove,
+        }),
+      });
+      const saved = await req.json();
+    } catch (err) {
+      console.error(err);
+    }
     setTags((prev) => prev.filter((t) => t !== tagToRemove));
   };
 
   const handleClose = () => {
     // Auto-save notes on close (dummy — logs instead of calling an API)
-    onSaveNotes?.(compound.id, notes);
+    onSaveNotes?.(name, smiles, tags, notes, compound.id);
     onClose();
   };
 
   return (
     <div
-      className="fixed inset-0 bg-slate-900/40 flex items-center justify-center z-50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
       onClick={handleClose}
     >
       <div
-        className="bg-white rounded-2xl shadow-xl flex flex-col md:flex-row w-full md:w-[90vw] md:max-w-5xl max-h-[85vh] overflow-y-auto md:overflow-hidden"
+        className="flex max-h-[85vh] w-full flex-col overflow-y-auto rounded-2xl bg-white shadow-xl md:w-[90vw] md:max-w-5xl md:flex-row md:overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Mobile-only header — hidden on desktop, X lives in the notes panel instead */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 border-b border-slate-200 shrink-0">
+        <div className="flex shrink-0 items-center gap-3 border-b border-slate-200 px-4 py-3 md:hidden">
           <button
             onClick={handleClose}
             aria-label="Tutup"
-            className="text-slate-700 hover:text-slate-900 transition-colors"
+            className="text-slate-700 transition-colors hover:text-slate-900"
           >
-            <X className="w-5 h-5" />
+            <X className="h-5 w-5" />
           </button>
-          <span className="font-semibold text-slate-900 font-['Space_Grotesk']">
+          <span className="font-['Space_Grotesk'] font-semibold text-slate-900">
             Edit senyawa
           </span>
         </div>
@@ -58,13 +77,13 @@ export default function EditCompound({ compound, onClose, onSaveNotes, figure}) 
         />
 
         {/* Right panel — notes. 2/3 width on desktop */}
-        <div className="md:w-2/3 p-6 flex flex-col md:overflow-y-auto">
-          <div className="flex items-center justify-between mb-3 shrink-0">
+        <div className="flex flex-col p-6 md:w-2/3 md:overflow-y-auto">
+          <div className="mb-3 flex shrink-0 items-center justify-between">
             <div className="flex items-baseline gap-2">
-              <span className="font-semibold text-slate-900 font-['Space_Grotesk']">
+              <span className="font-['Space_Grotesk'] font-semibold text-slate-900">
                 Catatan
               </span>
-              <span className="text-xs text-slate-400 font-['Plus_Jakarta_Sans']">
+              <span className="font-['Plus_Jakarta_Sans'] text-xs text-slate-400">
                 · 2 menit lalu
               </span>
             </div>
@@ -72,9 +91,9 @@ export default function EditCompound({ compound, onClose, onSaveNotes, figure}) 
             <button
               onClick={handleClose}
               aria-label="Tutup"
-              className="hidden md:block text-slate-400 hover:text-slate-700 transition-colors"
+              className="hidden text-slate-400 transition-colors hover:text-slate-700 md:block"
             >
-              <X className="w-5 h-5" />
+              <X className="h-5 w-5" />
             </button>
           </div>
 
@@ -82,7 +101,7 @@ export default function EditCompound({ compound, onClose, onSaveNotes, figure}) 
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
             placeholder="Tulis catatan..."
-            className="flex-1 w-full min-h-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 font-['Plus_Jakarta_Sans']"
+            className="min-h-50 w-full flex-1 resize-none rounded-xl border border-slate-200 p-4 font-['Plus_Jakarta_Sans'] text-sm text-slate-700 focus:ring-2 focus:ring-blue-500 focus:outline-none"
           />
         </div>
       </div>

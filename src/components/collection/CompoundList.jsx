@@ -45,14 +45,17 @@ function CompoundCard({ compound, onEdit, onDelete }) {
         <h3 className="font-['Space_Grotesk'] text-base font-semibold text-slate-900">
           {compound.name}
         </h3>
-        <p className="mt-0.5 font-mono truncate text-sm text-slate-400">
+        <p className="mt-0.5 truncate font-mono text-sm text-slate-400">
           {compound.smiles}
         </p>
 
         <div className="mt-3 flex items-center justify-between">
           <div className="flex flex-wrap gap-1.5">
             {compound.tags.map((tagName) => (
-              <span key={tagName} className="rounded-full bg-amber-100 px-3 py-1 font-['Plus_Jakarta_Sans'] text-xs font-medium text-amber-800">
+              <span
+                key={tagName}
+                className="rounded-full bg-amber-100 px-3 py-1 font-['Plus_Jakarta_Sans'] text-xs font-medium text-amber-800"
+              >
                 {tagName}
               </span>
             ))}
@@ -70,7 +73,7 @@ function CompoundCard({ compound, onEdit, onDelete }) {
   );
 }
 
-export default function CardList({ compounds, tags, compoundTags, fetching}) {
+export default function CardList({ compounds, tags, compoundTags, fetching }) {
   const [editingCompound, setEditingCompound] = useState(null);
 
   const handleEdit = (compound) => {
@@ -81,26 +84,45 @@ export default function CardList({ compounds, tags, compoundTags, fetching}) {
     setEditingCompound(null);
   };
 
-  const handleSaveNotes = (compoundId, notes) => {
-    // Dummy for now — will call update API later
-    console.log(`Auto-save notes for compound ${compoundId}:`, notes);
+  const handleSaveNotes = async (name, smiles, tags, notes, id) => {
+    try {
+      const req = await fetch('http://localhost:3000/api/compounds', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          compound: {
+            id: id,
+            name: name,
+            smiles: smiles,
+            notes: notes,
+            is_favorite: false,
+          },
+          tags: tags,
+        }),
+      });
+      const saved = await req.json();
+      fetching();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleDelete = async (compound) => {
     try {
-      console.log(compound.id)
+      console.log(compound.id);
       const req = await fetch('http://localhost:3000/api/compounds', {
-        method:'DELETE',
+        method: 'DELETE',
         credentials: 'include',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({"id": `${compound.id}`})
-      })
-      const res = await req.json()
-      console.log()
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: `${compound.id}` }),
+      });
+      const res = await req.json();
+      console.log();
     } catch (err) {
-      console.error(err)
+      console.error(err);
     }
-    fetching()
+    fetching();
   };
 
   return (
