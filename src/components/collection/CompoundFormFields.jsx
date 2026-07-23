@@ -6,10 +6,13 @@ function MoleculeFigure({ smiles }) {
   const svgRef = useRef(null);
 
   useEffect(() => {
-    if (!svgRef || !smiles) return;
+    if (!svgRef.current || !smiles) return;
 
-    const drawer = new SmilesDrawer.SmiDrawer({ width: 550, height: 450 });
+    const drawer = new SmilesDrawer.SmiDrawer({ scale: 1 });
     drawer.draw(smiles, svgRef.current, 'light');
+    // library memasang width/height px — kembalikan biar tetap responsif
+    svgRef.current.style.width = '100%';
+    svgRef.current.style.height = 'auto';
   }, [smiles]);
 
   return (
