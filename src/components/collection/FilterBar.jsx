@@ -1,14 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Filter, ChevronDown, X, Check } from "lucide-react";
 
-// Dummy data — replace with real tag counts from API later
-const DUMMY_TAGS = [
-  { id: "aromatic", label: "Aromatic", count: 4 },
-  { id: "alkane", label: "Alkane", count: 1 },
-  { id: "protein", label: "Protein", count: 0 },
-  { id: "amine", label: "Amine", count: 1 },
-];
-
 function useClickOutside(ref, onClose) {
   useEffect(() => {
     function handleClick(e) {
@@ -21,7 +13,7 @@ function useClickOutside(ref, onClose) {
   }, [ref, onClose]);
 }
 
-function TagFilterDropdown({ selectedTags, onToggleTag }) {
+function TagFilterDropdown({ tags, selectedTags, onToggleTag }) {
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef(null);
   useClickOutside(containerRef, () => setIsOpen(false));
@@ -39,8 +31,9 @@ function TagFilterDropdown({ selectedTags, onToggleTag }) {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-2 z-20">
-          {DUMMY_TAGS.map((tag) => {
+        <div className="absolute right-0 mt-2 w-56 bg-white border border-slate-200 rounded-xl shadow-lg py-2 z-20 ">
+        <div className="max-h-64 overflow-y-auto">
+          {tags.map((tag) => {
             const checked = selectedTags.includes(tag.id);
             return (
               <label
@@ -64,15 +57,13 @@ function TagFilterDropdown({ selectedTags, onToggleTag }) {
                     onChange={() => onToggleTag(tag.id)}
                   />
                   <span className="text-sm text-slate-700 font-medium font-['Plus_Jakarta_Sans']">
-                    {tag.label}
+                    {tag.name}
                   </span>
-                </span>
-                <span className="text-xs text-blue-600 font-medium">
-                  {tag.count}
                 </span>
               </label>
             );
           })}
+          </div>
           <div className="border-t border-slate-100 mt-1 pt-2 px-3">
             <button className="text-sm text-blue-600 hover:underline font-medium font-['Plus_Jakarta_Sans']">
               Kelola tag...
@@ -84,33 +75,31 @@ function TagFilterDropdown({ selectedTags, onToggleTag }) {
   );
 }
 
-export default function FilterBar() {
-  const [selectedTags, setSelectedTags] = useState(["aromatic"]);
-
+export default function FilterBar({ tags, selectedTags, onTagsChange }) {
   const toggleTag = (tagId) => {
-    setSelectedTags((prev) =>
-      prev.includes(tagId)
-        ? prev.filter((id) => id !== tagId)
-        : [...prev, tagId]
+    onTagsChange(
+      selectedTags.includes(tagId)
+        ? selectedTags.filter((id) => id !== tagId)
+        : [...selectedTags, tagId]
     );
   };
 
   const removeTag = (tagId) => {
-    setSelectedTags((prev) => prev.filter((id) => id !== tagId));
+    onTagsChange(selectedTags.filter((id) => id !== tagId));
   };
 
   return (
     <div className="sticky top-15 z-20 w-full bg-slate-50 flex items-start justify-between gap-4 px-6 py-4 border-b border-slate-200">
       <div className="flex flex-wrap items-center gap-2">
         {selectedTags.map((tagId) => {
-          const tag = DUMMY_TAGS.find((t) => t.id === tagId);
+          const tag = tags.find((t) => t.id === tagId);
           if (!tag) return null;
           return (
             <span
               key={tagId}
               className="flex items-center gap-1.5 bg-amber-100 text-amber-800 text-sm font-medium rounded-full pl-3 pr-2 py-1.5 font-['Plus_Jakarta_Sans']"
             >
-              {tag.label}
+              {tag.name}
               <button
                 onClick={() => removeTag(tagId)}
                 className="hover:bg-amber-200 rounded-full p-0.5 transition-colors"
@@ -123,7 +112,11 @@ export default function FilterBar() {
       </div>
 
       <div className="shrink-0">
-        <TagFilterDropdown selectedTags={selectedTags} onToggleTag={toggleTag} />
+        <TagFilterDropdown
+          tags={tags}
+          selectedTags={selectedTags}
+          onToggleTag={toggleTag}
+        />
       </div>
     </div>
   );
