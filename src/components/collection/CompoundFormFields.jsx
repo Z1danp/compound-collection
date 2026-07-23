@@ -2,6 +2,39 @@ import { useState, useRef, useEffect } from 'react';
 import { RefreshCw, X } from 'lucide-react';
 import SmilesDrawer from 'smiles-drawer';
 
+// Cari nama senyawa dari SMILES via PubChem.
+// Coba nama trivial/umum (sinonim pertama) dulu, baru jatuh ke nama IUPAC.
+async function fetchPubchemName(smiles) {
+  const options = {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ smiles }),
+  };
+
+  // 1. Nama trivial/umum
+  const synRes = await fetch(
+    'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/synonyms/JSON',
+    options
+  );
+  if (synRes.ok) {
+    const data = await synRes.json();
+    const synonym = data?.InformationList?.Information?.[0]?.Synonym?.[0];
+    if (synonym) return synonym;
+  }
+
+  // 2. Jatuh ke nama IUPAC
+  const iupacRes = await fetch(
+    'https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/smiles/property/IUPACName/JSON',
+    options
+  );
+  if (iupacRes.ok) {
+    const data = await iupacRes.json();
+    return data?.PropertyTable?.Properties?.[0]?.IUPACName ?? null;
+  }
+
+  return null;
+}
+
 function MoleculeFigure({ smiles }) {
   const svgRef = useRef(null);
 
@@ -42,7 +75,23 @@ export default function CompoundFormFields({
   const [tagInput, setTagInput] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const suggestionsRef = useRef(null);
+
+  const handleSync = async () => {
+    if (!smiles.trim()) return;
+    setIsSyncing(true);
+    try {
+      const name = await fetchPubchemName(smiles.trim());
+      if (name) {
+        onNameChange(name);
+      }
+    } catch (err) {
+      console.error('Gagal sinkron dari PubChem:', err);
+    } finally {
+      setIsSyncing(false);
+    }
+  };
 
   const suggestions = tagInput.trim()
     ? allTags.filter(
@@ -89,10 +138,13 @@ export default function CompoundFormFields({
           className="min-w-0 flex-1 rounded-lg border border-slate-200 px-3 py-2 font-['Space_Grotesk'] font-semibold text-slate-900 focus:ring-2 focus:ring-blue-500 focus:outline-none"
         />
         <button
-          aria-label="Regenerate"
-          className="shrink-0 rounded-lg border border-slate-200 p-2.5 text-blue-600 transition-colors hover:bg-slate-50"
+          type="button"
+          onClick={handleSync}
+          disabled={isSyncing || !smiles.trim()}
+          aria-label="Sinkron nama dari PubChem"
+          className="shrink-0 rounded-lg border border-slate-200 p-2.5 text-blue-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <RefreshCw className="h-5 w-5" />
+          <RefreshCw className={`h-5 w-5 ${isSyncing ? 'animate-spin' : ''}`} />
         </button>
       </div>
 
