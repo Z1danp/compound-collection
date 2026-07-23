@@ -38,6 +38,7 @@ export default function CompoundFormFields({
 }) {
   const [tagInput, setTagInput] = useState('');
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isPreviewExpanded, setIsPreviewExpanded] = useState(false);
   const suggestionsRef = useRef(null);
 
   const suggestions = tagInput.trim()
@@ -92,9 +93,23 @@ export default function CompoundFormFields({
         </button>
       </div>
 
-      <div className="mb-1.5 flex flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 px-10 py-10">
+      <button
+        type="button"
+        onClick={() => smiles.trim() && setIsPreviewExpanded((v) => !v)}
+        className={`mb-1.5 flex w-full flex-col items-center justify-center gap-2 rounded-xl border border-slate-200 transition-all ${
+          isPreviewExpanded ? 'px-10 py-10' : 'px-6 py-4'
+        } ${
+          smiles.trim()
+            ? isPreviewExpanded
+              ? 'cursor-zoom-out hover:border-slate-300'
+              : 'cursor-zoom-in hover:border-slate-300'
+            : 'cursor-default'
+        }`}
+      >
         {smiles.trim() ? (
-          <MoleculeFigure smiles={smiles} />
+          <div className={isPreviewExpanded ? 'w-full' : 'w-40'}>
+            <MoleculeFigure smiles={smiles} />
+          </div>
         ) : (
           <>
             <svg
@@ -111,9 +126,13 @@ export default function CompoundFormFields({
             </p>
           </>
         )}
-      </div>
+      </button>
       <p className="mb-4 font-['Plus_Jakarta_Sans'] text-xs text-slate-400">
-        Preview struktur — mengikuti SMILES di bawah
+        {smiles.trim()
+          ? isPreviewExpanded
+            ? 'Klik struktur untuk perkecil'
+            : 'Klik struktur untuk perbesar'
+          : 'Preview struktur — mengikuti SMILES di bawah'}
       </p>
 
       <label className="mb-1.5 block font-['Plus_Jakarta_Sans'] text-sm font-semibold text-slate-900">
