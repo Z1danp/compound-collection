@@ -81,7 +81,7 @@ export async function login(req, res) {
       sameSite: 'strict',
       maxAge: 60 * 60 * 1000,
     });
-// kirim info user setelah sukses login
+    // kirim info user setelah sukses login
     res.json({
       id: user.id,
       name: user.name,
@@ -92,4 +92,16 @@ export async function login(req, res) {
     console.error(err);
     res.status(500).json({ error: 'Terjadi kesalahan server' });
   }
+}
+
+export async function logout(req, res) {
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+  });
+
+  res.json({
+    message: 'Logout success'
+  })
 }

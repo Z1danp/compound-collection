@@ -1,52 +1,53 @@
-import { useState } from "react";
-import { Search, Plus, LogOut, X } from "lucide-react";
-
+import { useState } from 'react';
+import { Search, Plus, LogOut, X } from 'lucide-react';
+import { useAuth } from '../auth/AuthContext';
 
 export default function Navbar({ onAddClick, searchQuery, onSearchChange }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const { logout } = useAuth();
 
   return (
-    <nav className="sticky top-0 z-30 w-full bg-white border-b border-slate-200">
+    <nav className="sticky top-0 z-30 w-full border-b border-slate-200 bg-white">
       {/* Main row — always visible */}
-      <div className="flex items-center justify-between gap-4 px-4 sm:px-6 py-3">
+      <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         {/* Logo + Wordmark */}
-        <div className="flex items-center gap-2.5 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-sm font-['Space_Grotesk']">
+        <div className="flex shrink-0 items-center gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600">
+            <span className="font-['Space_Grotesk'] text-sm font-bold text-white">
               R
             </span>
           </div>
-          <span className="hidden sm:inline font-semibold text-slate-900 text-base font-['Space_Grotesk']">
+          <span className="hidden font-['Space_Grotesk'] text-base font-semibold text-slate-900 sm:inline">
             Renik Notes
           </span>
         </div>
 
         {/* Search bar — full width on sm+, icon-only toggle below sm */}
-        <div className="flex-1 max-w-xl hidden sm:block">
-          <div className="flex items-center gap-2 bg-slate-100 rounded-full px-4 py-2">
-            <Search className="w-4 h-4 text-slate-400 shrink-0" />
+        <div className="hidden max-w-xl flex-1 sm:block">
+          <div className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2">
+            <Search className="h-4 w-4 shrink-0 text-slate-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Cari nama, SMILES, atau tag..."
-              className="w-full bg-transparent text-sm text-slate-600 placeholder:text-slate-400 outline-none font-['Plus_Jakarta_Sans']"
+              className="w-full bg-transparent font-['Plus_Jakarta_Sans'] text-sm text-slate-600 outline-none placeholder:text-slate-400"
             />
           </div>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex shrink-0 items-center gap-2 sm:gap-3">
           {/* Search icon toggle — mobile only */}
           <button
             onClick={() => setIsSearchOpen((prev) => !prev)}
-            aria-label={isSearchOpen ? "Tutup pencarian" : "Buka pencarian"}
-            className="sm:hidden flex items-center justify-center w-9 h-9 rounded-full text-slate-600 hover:bg-slate-100 transition-colors"
+            aria-label={isSearchOpen ? 'Tutup pencarian' : 'Buka pencarian'}
+            className="flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition-colors hover:bg-slate-100 sm:hidden"
           >
             {isSearchOpen ? (
-              <X className="w-4 h-4" />
+              <X className="h-4 w-4" />
             ) : (
-              <Search className="w-4 h-4" />
+              <Search className="h-4 w-4" />
             )}
           </button>
 
@@ -54,19 +55,19 @@ export default function Navbar({ onAddClick, searchQuery, onSearchChange }) {
           <button
             onClick={onAddClick}
             aria-label="Tambah senyawa"
-            className="flex items-center gap-1.5 bg-amber-500 hover:bg-amber-600 transition-colors text-white text-sm font-medium rounded-full px-3 sm:px-4 py-2 font-['Plus_Jakarta_Sans']"
+            className="flex items-center gap-1.5 rounded-full bg-amber-500 px-3 py-2 font-['Plus_Jakarta_Sans'] text-sm font-medium text-white transition-colors hover:bg-amber-600 sm:px-4"
           >
-            <Plus className="w-4 h-4 shrink-0" />
+            <Plus className="h-4 w-4 shrink-0" />
             <span className="hidden sm:inline">Tambah senyawa</span>
           </button>
 
           {/* Logout — icon-only below sm */}
           <button
             aria-label="Logout"
-            
-            className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-sm font-medium rounded-full px-3 sm:px-4 py-2 font-['Plus_Jakarta_Sans']"
+            onClick={logout}
+            className="flex items-center gap-1.5 rounded-full px-3 py-2 font-['Plus_Jakarta_Sans'] text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900 sm:px-4"
           >
-            <LogOut className="w-4 h-4 shrink-0" />
+            <LogOut className="h-4 w-4 shrink-0" />
             <span className="hidden sm:inline">Logout</span>
           </button>
         </div>
@@ -74,16 +75,16 @@ export default function Navbar({ onAddClick, searchQuery, onSearchChange }) {
 
       {/* Second row — search input, mobile only, shown when toggled open */}
       {isSearchOpen && (
-        <div className="sm:hidden px-4 pb-3">
-          <div className="flex items-center gap-2 bg-slate-100 rounded-full px-4 py-2">
-            <Search className="w-4 h-4 text-slate-400 shrink-0" />
+        <div className="px-4 pb-3 sm:hidden">
+          <div className="flex items-center gap-2 rounded-full bg-slate-100 px-4 py-2">
+            <Search className="h-4 w-4 shrink-0 text-slate-400" />
             <input
               type="text"
               autoFocus
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Cari nama, SMILES, atau tag..."
-              className="w-full bg-transparent text-sm text-slate-600 placeholder:text-slate-400 outline-none font-['Plus_Jakarta_Sans']"
+              className="w-full bg-transparent font-['Plus_Jakarta_Sans'] text-sm text-slate-600 outline-none placeholder:text-slate-400"
             />
           </div>
         </div>
