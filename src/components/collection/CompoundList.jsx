@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Trash2 } from 'lucide-react';
+import { Trash2, Star } from 'lucide-react';
 import EditCompound from './EditCompound';
 import SmilesDrawer from 'smiles-drawer';
 
@@ -20,7 +20,7 @@ function MoleculeFigure({ smiles }) {
   );
 }
 
-function CompoundCard({ compound, onEdit, onDelete }) {
+function CompoundCard({ compound, onEdit, onDelete, onToggleFavorite }) {
   const handleCardClick = () => {
     onEdit(compound);
   };
@@ -33,8 +33,24 @@ function CompoundCard({ compound, onEdit, onDelete }) {
   return (
     <div
       onClick={handleCardClick}
-      className="cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:border-slate-300 hover:shadow-md"
+      className="relative cursor-pointer overflow-hidden rounded-2xl border border-slate-200 bg-white transition-all hover:border-slate-300 hover:shadow-md"
     >
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onToggleFavorite(compound)
+        }}
+        aria-label="Favorit"
+        className="absolute top-2 right-2 z-10 rounded-full bg-white/80 p-1.5 transition-colors hover:bg-slate-100"
+      >
+        <Star
+          className={`h-4 w-4 ${
+            compound.is_favorite
+              ? 'fill-amber-400 text-amber-400' // terisi saat favorit
+              : 'text-slate-300' // garis luar saat bukan
+          }`}
+        />
+      </button>
       <div className="flex items-center justify-center bg-white py-8">
         <MoleculeFigure smiles={compound.smiles} />
       </div>
@@ -131,12 +147,35 @@ export default function CardList({
     fetching();
   };
 
+  const handleToggleFavorite = async (compound) => {
+    try {
+      await fetch('http://localhost:3000/api/compounds', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          compound: {
+            id: compound.id,
+            name: compound.name,
+            smiles: compound.smiles,
+            notes: compound.notes,
+            is_favorite: !compound.is_favorite,
+          },
+          tags: compound.tags,
+        }),
+      });
+    } catch (err) {
+      console.error(err);
+    }
+    fetching();
+  };
   return (
     <>
       <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
         {compounds.map((compound) => (
           <CompoundCard
             key={compound.id}
+            onToggleFavorite={handleToggleFavorite}
             compound={compound}
             onEdit={handleEdit}
             onDelete={handleDelete}

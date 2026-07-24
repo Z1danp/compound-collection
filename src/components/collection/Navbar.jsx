@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Search, Plus, LogOut, X } from "lucide-react";
 
-export default function Navbar({ onAddClick }) {
+
+export default function Navbar({ onAddClick, searchQuery, onSearchChange }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
@@ -26,6 +27,8 @@ export default function Navbar({ onAddClick }) {
             <Search className="w-4 h-4 text-slate-400 shrink-0" />
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Cari nama, SMILES, atau tag..."
               className="w-full bg-transparent text-sm text-slate-600 placeholder:text-slate-400 outline-none font-['Plus_Jakarta_Sans']"
             />
@@ -60,6 +63,7 @@ export default function Navbar({ onAddClick }) {
           {/* Logout — icon-only below sm */}
           <button
             aria-label="Logout"
+            
             className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors text-sm font-medium rounded-full px-3 sm:px-4 py-2 font-['Plus_Jakarta_Sans']"
           >
             <LogOut className="w-4 h-4 shrink-0" />
@@ -76,6 +80,8 @@ export default function Navbar({ onAddClick }) {
             <input
               type="text"
               autoFocus
+              value={searchQuery}
+              onChange={(e) => onSearchChange(e.target.value)}
               placeholder="Cari nama, SMILES, atau tag..."
               className="w-full bg-transparent text-sm text-slate-600 placeholder:text-slate-400 outline-none font-['Plus_Jakarta_Sans']"
             />

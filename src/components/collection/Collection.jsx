@@ -8,7 +8,9 @@ function Collection() {
   const [compounds, setCompounds] = useState([]);
   const [tags, setTags] = useState([]);
   const [compoundTags, setCompoundTags] = useState([]);
-   const [selectedTags, setSelectedTags] = useState([]);
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [isAddOpen, setIsAddOpen] = useState(false);
   const abortControllerRef = useRef(null);
 
@@ -98,16 +100,40 @@ function Collection() {
       : compoundsWithTags.filter((c) =>
           selectedTags.every((tagId) => c.tags.includes(tagNameById[tagId]))
         );
+
+  // search
+  const q = searchQuery.trim().toLowerCase();
+  const searchCompounds =
+    q === ''
+      ? filteredCompounds
+      : filteredCompounds.filter((c) => {
+          const matchName = c.name.toLowerCase().includes(q);
+          const matchSmiles = c.smiles.toLowerCase().includes(q);
+          const matchTags = c.tags.some((tagName) =>
+            tagName.toLowerCase().includes(q)
+          );
+
+          return matchName || matchSmiles || matchTags;
+        });
+
+  // Favorite
+  const favoriteCompounds = showFavoritesOnly ? searchCompounds.filter((c) => c.is_favorite === true): searchCompounds
   return (
-     <div>
-      <Navbar onAddClick={() => setIsAddOpen(true)} />
+    <div>
+      <Navbar
+        onAddClick={() => setIsAddOpen(true)}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+      />
       <FilterBar
         tags={tags}
         selectedTags={selectedTags}
         onTagsChange={setSelectedTags}
+        showFavoritesOnly={showFavoritesOnly}
+        onToggleFavorites={() => setShowFavoritesOnly((v) => !v)}
       />
       <CardList
-        compounds={filteredCompounds}     // <-- ganti jadi filtered
+        compounds={favoriteCompounds} // <-- ganti jadi filtered
         tags={tagNameById}
         compoundTags={compoundsWithTags}
         fetching={fetchCompounds}
