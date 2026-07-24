@@ -73,10 +73,7 @@ function Collection() {
           tags: newCompound.tags,
         }),
       });
-      const saved = await req.json();
-      setCompounds((prev) => [...prev, saved.compound]);
-      setTags((prev) => [...prev, saved.tags]);
-      setCompoundTags((prev) => [...prev, saved.compoundTags]);
+     fetchCompounds()
     } catch (err) {
       console.error({ message: err });
     }
