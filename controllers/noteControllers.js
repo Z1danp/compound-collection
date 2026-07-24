@@ -98,7 +98,7 @@ export async function updateCompound(req, res) {
     await client.query('BEGIN');
 
     const compoundResult = await client.query(
-      `UPDATE compounds SET name = $3, smiles = $4, notes = $5, is_favorite = $6
+      `UPDATE compounds SET name = $3, smiles = $4, notes = $5, is_favorite = $6, updated_at = NOW ()
       WHERE user_id = $1 AND id = $2
       RETURNING id, name, smiles, notes, is_favorite`,
       [

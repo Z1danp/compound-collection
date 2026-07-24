@@ -13,6 +13,7 @@ export default function EditCompound({
   const [smiles, setSmiles] = useState(compound?.smiles ?? '');
   const [tags, setTags] = useState(compound?.tags || []);
   const [notes, setNotes] = useState(compound?.notes || '');
+  const [updated, setUpdated] = useState(compound?.updated_at || '');
 
   if (!compound) return null;
 
@@ -44,6 +45,21 @@ export default function EditCompound({
     onClose();
   };
 
+  const updateTime = (startTime) => {
+    const now = Date.now() * 0.001;
+    const updated = Date.parse(startTime) * 0.001;
+    const elapsed = now - updated;
+
+    if (elapsed < 60) {
+      return `${Math.floor(elapsed)} detik yang lalu`;
+    } else if (elapsed < 3600) {
+      return `${Math.floor(elapsed / 60)} menit yang lalu`;
+    } else if (elapsed < 86400) {
+      return `${Math.floor(elapsed / 3600)} jam yang lalu`;
+    } else {
+      return `${Math.floor(elapsed / 86400)} hari yang lalu`;
+    }
+  };
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
@@ -86,7 +102,7 @@ export default function EditCompound({
                 Catatan
               </span>
               <span className="font-['Plus_Jakarta_Sans'] text-xs text-slate-400">
-                · 2 menit lalu
+                {updateTime(updated)}
               </span>
             </div>
             {/* Desktop-only close button — mobile uses the header X instead */}
