@@ -94,6 +94,48 @@ export async function login(req, res) {
   }
 }
 
+export async function guestLogin(req, res) {
+  try {
+    const email = `guest_${crypto.randomUUID()}@guest.com`;
+    const name = 'guest';
+    const isGuest = 'true';
+    const password = 'StandardPhase';
+    const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
+
+    const result = await pool.query(
+      `
+      INSERT INTO users (name, email, password_hash, is_guest)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, name, email, password_hash, is_guest`,
+      [name, email, password_hash, isGuest]
+    );
+
+    const userGuest = result.rows[0];
+
+    const token = jwt.sign(
+      { userId: userGuest.id, is_guest: userGuest.is_guest },
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' }
+    );
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 60 * 60 * 1000,
+    });
+    // kirim info user setelah sukses login
+    res.json({
+      id: userGuest.id,
+      name: userGuest.name,
+      email: userGuest.email,
+      is_guest: userGuest.is_guest,
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Terjadi kesalahan server' });
+  }
+}
+
 export async function logout(req, res) {
   res.clearCookie('token', {
     httpOnly: true,
@@ -102,6 +144,6 @@ export async function logout(req, res) {
   });
 
   res.json({
-    message: 'Logout success'
-  })
+    message: 'Logout success',
+  });
 }

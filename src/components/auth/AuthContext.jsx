@@ -53,16 +53,36 @@ export function AuthProvider({ children }) {
     }
   }
 
+  async function loginAsGuest() {
+    dispatch({ type: 'LOGIN_START' });
+    try {
+      const req = await fetch('http://localhost:3000/guest', {
+        method: 'POST',
+        credentials: 'include',
+      });
+      const data = await req.json();
+
+      if (!req.ok) {
+        throw new Error(data.error);
+      }
+      dispatch({ type: 'LOGIN_SUCCESS', payload: data });
+      return data;
+    } catch (err) {
+      dispatch({ type: 'LOGIN_FAIL', payload: err.message });
+      throw err;
+    }
+  }
+
   async function logout() {
     await fetch('http://localhost:3000/logout', {
       method: 'POST',
-      credentials: 'include'
-    })
+      credentials: 'include',
+    });
     dispatch({ type: 'LOGOUT' });
   }
 
   return (
-    <AuthContext.Provider value={{ ...state, login, logout }}>
+    <AuthContext.Provider value={{ ...state, login, logout, loginAsGuest }}>
       {children}
     </AuthContext.Provider>
   );

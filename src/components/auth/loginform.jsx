@@ -8,7 +8,7 @@ function LoginForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const { login, loginAsGuest } = useAuth();
   const navigate = useNavigate();
 
   async function handleSubmit(e) {
@@ -17,6 +17,17 @@ function LoginForm() {
 
     try {
       await login({ email, password });
+      navigate('/');
+    } catch (error) {
+      setError(error.message);
+    }
+  }
+
+  async function handleGuest() {
+    setError('');
+
+    try {
+      await loginAsGuest();
       navigate('/');
     } catch (error) {
       setError(error.message);
@@ -136,6 +147,14 @@ function LoginForm() {
                 className="w-full rounded-lg bg-blue-600 py-3 font-bold text-white transition hover:bg-blue-700 focus:ring-2 focus:ring-blue-600/40 focus:outline-none"
               >
                 Sign In
+              </button>
+
+              <button
+                type="button"
+                onClick={handleGuest}
+                className="w-full rounded-lg border border-slate-300 bg-white py-3 font-bold text-slate-700 transition hover:bg-slate-50 focus:ring-2 focus:ring-slate-400/40 focus:outline-none"
+              >
+                Continue as guest
               </button>
 
               {/* Notif error / validasi muncul di sini, di bawah tombol */}
