@@ -129,7 +129,7 @@ export default function CompoundFormFields({
 
   return (
     <div className="border-b border-slate-200 p-6 md:w-1/2 md:overflow-y-auto md:border-r md:border-b-0">
-      <div className="mb-4 flex items-center gap-2">
+      <div className="mb-1.5 flex items-center gap-2">
         <input
           type="text"
           value={name}
@@ -147,6 +147,13 @@ export default function CompoundFormFields({
           <RefreshCw className={`h-5 w-5 ${isSyncing ? 'animate-spin' : ''}`} />
         </button>
       </div>
+      <p className="mb-4 font-['Plus_Jakarta_Sans'] text-xs text-slate-400">
+        {isSyncing
+          ? 'Mengambil nama dari PubChem…'
+          : smiles.trim()
+            ? 'Klik ↻ untuk isi nama otomatis dari SMILES'
+            : 'Tulis SMILES dulu, lalu klik ↻ untuk isi nama otomatis'}
+      </p>
 
       <button
         type="button"
