@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Search, Plus, LogOut, X } from 'lucide-react';
-import { useAuth } from 'src/components/auth/AuthContext.jsx';
+import { useAuth } from '../auth/AuthContext.jsx';
 
 export default function Navbar({ onAddClick, searchQuery, onSearchChange }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);

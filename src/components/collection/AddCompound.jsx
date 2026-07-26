@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { X } from "lucide-react";
-import CompoundFormFields from "src/components/collection/CompoundFormFields.jsx";
+import CompoundFormFields from "./CompoundFormFields.jsx";
 
 export default function AddCompound({ onClose, onAdd, allTags }) {
   const [name, setName] = useState("");

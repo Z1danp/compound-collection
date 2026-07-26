@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Trash2, Star } from 'lucide-react';
-import EditCompound from 'src/components/collection/EditCompound.jsx';
+import EditCompound from './EditCompound.jsx';
 import SmilesDrawer from 'smiles-drawer';
 
 function MoleculeFigure({ smiles }) {
