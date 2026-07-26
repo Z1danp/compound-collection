@@ -7,17 +7,26 @@
     },
     {
       "src": "package.json",
-      "use": "@vercel/vite"
+      "use": "@vercel/static-build"
     }
   ],
   "routes": [
+    {
+      "handle": "filesystem"
+    },
     {
       "src": "/api/(.*)",
       "dest": "server.js"
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "/index.html"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron/cleanup-guests",
+      "schedule": "0 3 * * *"
     }
   ]
 }
