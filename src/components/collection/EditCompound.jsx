@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
-import CompoundFormFields from './CompoundFormFields.jsx';
+import CompoundFormFields from 'src/components/collection/CompoundFormFields.jsx';
 
 export default function EditCompound({
   compound,

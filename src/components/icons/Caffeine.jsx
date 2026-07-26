@@ -1,4 +1,4 @@
-import caffeine from "../../assets/caffeine.svg?raw";
+import caffeine from "src/assets/caffeine.svg?raw";
 
 export default function Caffeine({ className = "" }) {
   return (

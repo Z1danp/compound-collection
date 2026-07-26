@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import Caffeine from '../icons/Caffeine.jsx';
+import Caffeine from 'src/components/icons/Caffeine.jsx';
 import { useNavigate } from 'react-router-dom';
 
 function RegistForm() {

@@ -1,8 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
-import CardList from './CompoundList.jsx';
-import FilterBar from './FilterBar.jsx';
-import Navbar from './NavBar.jsx';
-import AddCompound from './AddCompound.jsx';
+import CardList from 'src/components/collection/CompoundList.jsx';
+import FilterBar from 'src/components/collection/FilterBar.jsx';
+import Navbar from 'src/components/collection/NavBar.jsx';
+import AddCompound from 'src/components/collection/AddCompound.jsx';
 
 function Collection() {
   const [compounds, setCompounds] = useState([]);

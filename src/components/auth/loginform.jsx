@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import Caffeine from '../icons/Caffeine.jsx';
-import { useAuth } from './AuthContext.jsx';
+import Caffeine from 'src/components/icons/Caffeine.jsx';
+import { useAuth } from 'src/components/auth/AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 
 function LoginForm() {
