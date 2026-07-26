@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Plus, LogOut, X } from 'lucide-react';
 import { useAuth } from '../auth/AuthContext.jsx';
+import RenikLogo from '../icons/RenikLogo.jsx';
 
 export default function Navbar({ onAddClick, searchQuery, onSearchChange }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -12,10 +13,8 @@ export default function Navbar({ onAddClick, searchQuery, onSearchChange }) {
       <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-6">
         {/* Logo + Wordmark */}
         <div className="flex shrink-0 items-center gap-2.5">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-600">
-            <span className="font-['Space_Grotesk'] text-sm font-bold text-white">
-              R
-            </span>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg">
+            <RenikLogo className="h-8 w-8" />
           </div>
           <span className="hidden font-['Space_Grotesk'] text-base font-semibold text-slate-900 sm:inline">
             Renik Notes

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Caffeine from '../icons/Caffeine.jsx';
+import Renik from '../icons/Renik.jsx';
 import { useAuth } from './AuthContext.jsx';
 import { useNavigate } from 'react-router-dom';
 
@@ -42,8 +43,8 @@ function LoginForm() {
           <div className="relative overflow-hidden bg-blue-700 px-6 py-6 sm:px-8">
             <Caffeine className="pointer-events-none absolute -top-8 -right-6 w-56 text-white/15" />
             <div className="relative flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-xl font-extrabold text-blue-700">
-                R
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white">
+                <Renik className="h-8 w-8" />
               </div>
               <div className="text-white">
                 <h1 className="text-xl leading-tight font-bold">Renik Notes</h1>

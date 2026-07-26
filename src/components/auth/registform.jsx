@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import Caffeine from '../icons/Caffeine.jsx';
+import Renik from '../icons/Renik.jsx';
 import { useNavigate } from 'react-router-dom';
 import { API_URL } from '../../lib/api.js';
 
@@ -9,25 +10,25 @@ function RegistForm() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
     try {
       const req = await fetch(`${API_URL}/api/regist`, {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name,
           email,
-          password
-        })
-      })
+          password,
+        }),
+      });
       if (req.ok) {
-        navigate('/')
+        navigate('/');
       }
-    } catch(err) {
-      setError(err.message)
+    } catch (err) {
+      setError(err.message);
     }
   }
 
@@ -39,8 +40,8 @@ function RegistForm() {
           <div className="relative overflow-hidden bg-blue-700 px-6 py-6 sm:px-8">
             <Caffeine className="pointer-events-none absolute -top-8 -right-6 w-56 text-white/15" />
             <div className="relative flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-xl font-extrabold text-blue-700">
-                R
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white">
+                <Renik className="h-8 w-8" />
               </div>
               <div className="text-white">
                 <h1 className="text-xl leading-tight font-bold">Renik Notes</h1>
