@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import Caffeine from '../icons/Caffeine.jsx';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../../lib/api.js';
 
 function RegistForm() {
   const [name, setName] = useState('');
@@ -13,7 +14,7 @@ function RegistForm() {
   async function handleSubmit(e) {
     e.preventDefault();
     try {
-      const req = await fetch('http://localhost:3000/regist', {
+      const req = await fetch(`${API_URL}/api/regist`, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({

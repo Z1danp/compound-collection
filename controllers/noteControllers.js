@@ -1,4 +1,4 @@
-import pool from '/db/pool.js';
+import pool from '../db/pool.js';
 
 // hapus tag yang udah gak nempel ke compound manapun (dicek per id, aman kalau ternyata masih dipakai)
 async function deleteOrphanTags(client, tagIds) {

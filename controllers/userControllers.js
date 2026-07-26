@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import pool from '/db/pool.js';
+import pool from '../db/pool.js';
 import jwt from 'jsonwebtoken';
 import 'dotenv/config';
 import { TUTORIAL_COMPOUNDS } from '../data/tutorialCompounds.js';

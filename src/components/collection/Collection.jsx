@@ -3,6 +3,7 @@ import CardList from './CompoundList.jsx';
 import FilterBar from './FilterBar.jsx';
 import Navbar from './Navbar.jsx';
 import AddCompound from './AddCompound.jsx';
+import { API_URL } from '../../lib/api.js';
 
 function Collection() {
   const [compounds, setCompounds] = useState([]);
@@ -20,7 +21,7 @@ function Collection() {
     abortControllerRef.current = controller;
 
     try {
-      const res = await fetch('http://localhost:3000/api/user/data', {
+      const res = await fetch(`${API_URL}/api/user/data`, {
         credentials: 'include',
         signal: controller.signal,
       });
@@ -59,7 +60,7 @@ function Collection() {
 
   const handleAddCompound = async (newCompound) => {
     try {
-      const req = await fetch('http://localhost:3000/api/compounds', {
+      const req = await fetch(`${API_URL}/api/compounds`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

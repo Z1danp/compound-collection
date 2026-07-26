@@ -5,11 +5,11 @@ import { getUserData, addCompound, deleteCompound, updateCompound, removeTag } f
 
 const router = express.Router()
 
-router.post('/login', login)
-router.post('/regist', register)
-router.post('/guest', guestLogin)
-router.get('/me', authMiddleware, getMe)
-router.post('/logout', logout)
+router.post('/api/login', login)
+router.post('/api/regist', register)
+router.post('/api/guest', guestLogin)
+router.get('/api/me', authMiddleware, getMe)
+router.post('/api/logout', logout)
 router.get('/api/user/data', authMiddleware, getUserData)
 router.post('/api/compounds', authMiddleware, addCompound)
 router.delete('/api/compounds', authMiddleware, deleteCompound)

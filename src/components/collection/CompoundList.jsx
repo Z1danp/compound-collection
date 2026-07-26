@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Trash2, Star } from 'lucide-react';
 import EditCompound from './EditCompound.jsx';
+import { API_URL } from '../../lib/api.js';
 import SmilesDrawer from 'smiles-drawer';
 
 function MoleculeFigure({ smiles }) {
@@ -108,7 +109,7 @@ export default function CardList({
 
   const handleSaveNotes = async (name, smiles, tags, notes, id) => {
     try {
-      const req = await fetch('http://localhost:3000/api/compounds', {
+      const req = await fetch(`${API_URL}/api/compounds`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -133,7 +134,7 @@ export default function CardList({
   const handleDelete = async (compound) => {
     try {
       console.log(compound.id);
-      const req = await fetch('http://localhost:3000/api/compounds', {
+      const req = await fetch(`${API_URL}/api/compounds`, {
         method: 'DELETE',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
@@ -149,7 +150,7 @@ export default function CardList({
 
   const handleToggleFavorite = async (compound) => {
     try {
-      await fetch('http://localhost:3000/api/compounds', {
+      await fetch(`${API_URL}/api/compounds`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

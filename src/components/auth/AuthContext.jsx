@@ -1,5 +1,6 @@
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import { authReducer, initialState } from './authReducer.js';
+import { API_URL } from '../../lib/api.js';
 
 const AuthContext = createContext(null);
 
@@ -10,7 +11,7 @@ export function AuthProvider({ children }) {
     async function checkSession() {
       dispatch({ type: 'CHECK_START' });
       try {
-        const res = await fetch('http://localhost:3000/me', {
+        const res = await fetch(`${API_URL}/api/me`, {
           credentials: 'include',
         });
 
@@ -32,7 +33,7 @@ export function AuthProvider({ children }) {
   async function login({ email, password }) {
     dispatch({ type: 'LOGIN_START' });
     try {
-      const res = await fetch('http://localhost:3000/login', {
+      const res = await fetch(`${API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -56,7 +57,7 @@ export function AuthProvider({ children }) {
   async function loginAsGuest() {
     dispatch({ type: 'LOGIN_START' });
     try {
-      const req = await fetch('http://localhost:3000/guest', {
+      const req = await fetch(`${API_URL}/api/guest`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -74,7 +75,7 @@ export function AuthProvider({ children }) {
   }
 
   async function logout() {
-    await fetch('http://localhost:3000/logout', {
+    await fetch(`${API_URL}/api/logout`, {
       method: 'POST',
       credentials: 'include',
     });

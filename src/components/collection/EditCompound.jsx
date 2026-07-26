@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { X } from 'lucide-react';
 import CompoundFormFields from './CompoundFormFields.jsx';
+import { API_URL } from '../../lib/api.js';
 
 export default function EditCompound({
   compound,
@@ -23,7 +24,7 @@ export default function EditCompound({
 
   const handleRemoveTag = async (tagToRemove) => {
     try {
-      const req = await fetch('http://localhost:3000/api/compounds/tags', {
+      const req = await fetch(`${API_URL}/api/compounds/tags`, {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
