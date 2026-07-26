@@ -1,9 +1,9 @@
 import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
-import router from '../routes/renik.js';
+import router from '/routes/renik.js';
 import cookieParser from 'cookie-parser';
-import pool from '../db/pool.js';
+import pool from '/db/pool.js';
 
 const app = express();
 
