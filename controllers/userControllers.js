@@ -153,7 +153,7 @@ export async function guestLogin(req, res) {
     const email = `guest_${crypto.randomUUID()}@guest.com`;
     const name = 'guest';
     const isGuest = true;
-    const password = 'StandardPhase';
+    const password = process.env.JWT_SECRET;
     const password_hash = await bcrypt.hash(password, SALT_ROUNDS);
 
     const result = await client.query(
