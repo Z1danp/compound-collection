@@ -64,11 +64,6 @@ function TagFilterDropdown({ tags, selectedTags, onToggleTag }) {
               );
             })}
           </div>
-          <div className="mt-1 border-t border-slate-100 px-3 pt-2">
-            <button className="font-['Plus_Jakarta_Sans'] text-sm font-medium text-blue-600 hover:underline">
-              Kelola tag...
-            </button>
-          </div>
         </div>
       )}
     </div>
