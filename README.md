@@ -19,13 +19,9 @@
   - Mengorganisir senyawa kimia menggunakan tag custom dengan relasi **many-to-many** (tabel penghubung `compound_tags`).
   - **Filter Bar Interaktif**: Filter senyawa berdasarkan satu atau beberapa tag sekaligus dengan logika filter presisi (`AND` condition via `.every()`).
 
-- 📝 **Catatan Riset Berbasis Markdown**
-  - Dukungan sintaks Markdown untuk kolom catatan (`notes`), memudahkan pencatatan sifat fisik, mekanisme reaksi, atau ringkasan literatur.
+- 📝 **Catatan (Notes)**
+  - Kolom catatan (`notes`) fleksibel untuk menyimpan informasi sifat fisik, mekanisme reaksi, ketersediaan di lab, atau ringkasan literatur dalam bentuk teks.
   - Fitur **Favorite (`is_favorite`)** untuk menyematkan (*pin*) senyawa penting ke bagian atas daftar.
-
-- ⚡ **Arsitektur Modern & Ringan**
-  - Dibangun dengan **React 19**, **Vite**, **Tailwind CSS v4**, **Express.js**, dan **PostgreSQL**.
-  - Siap dideploy secara serverless di **Vercel**.
 
 ---
 
@@ -78,3 +74,54 @@ compound-collection/
 ├── vercel.json              # Konfigurasi deployment Vercel
 ├── vite.config.js           # Konfigurasi Vite
 └── package.json
+```
+
+---
+
+## 🗄️ Skema Database (PostgreSQL)
+
+Aplikasi ini menggunakan skema relasional yang terstruktur dan ternormalisasi:
+
+```sql
+-- Tabel Users (Mendukung akun terdaftar & akun guest)
+CREATE TABLE users (
+    id              SERIAL PRIMARY KEY,
+    name            VARCHAR(255) NOT NULL,
+    is_guest        BOOLEAN NOT NULL DEFAULT false,
+    email           VARCHAR(255) UNIQUE NOT NULL,
+    password_hash   VARCHAR(255) NOT NULL,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Tabel Compounds
+CREATE TABLE compounds (
+    id              SERIAL PRIMARY KEY,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name            VARCHAR(255) NOT NULL,
+    smiles          TEXT NOT NULL,
+    notes           TEXT,
+    is_favorite     BOOLEAN NOT NULL DEFAULT false,
+    created_at      TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at      TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- Tabel Tags (Unik per user)
+CREATE TABLE tags (
+    id              SERIAL PRIMARY KEY,
+    user_id         INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    name            VARCHAR(50) NOT NULL,
+    UNIQUE (user_id, name)
+);
+
+-- Tabel Penghubung Many-to-Many
+CREATE TABLE compound_tags (
+    compound_id     INTEGER NOT NULL REFERENCES compounds(id) ON DELETE CASCADE,
+    tag_id          INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+    PRIMARY KEY (compound_id, tag_id)
+);
+
+CREATE INDEX idx_compounds_user_id ON compounds(user_id);
+CREATE INDEX idx_compound_tags_tag_id ON compound_tags(tag_id);
+```
+
+---
