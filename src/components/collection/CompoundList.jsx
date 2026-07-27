@@ -38,8 +38,8 @@ function CompoundCard({ compound, onEdit, onDelete, onToggleFavorite }) {
     >
       <button
         onClick={(e) => {
-          e.stopPropagation()
-          onToggleFavorite(compound)
+          e.stopPropagation();
+          onToggleFavorite(compound);
         }}
         aria-label="Favorit"
         className="absolute top-2 right-2 z-10 rounded-full bg-white/80 p-1.5 transition-colors hover:bg-slate-100"
@@ -172,7 +172,7 @@ export default function CardList({
   };
   return (
     <>
-      <div className="grid grid-cols-1 gap-4 p-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 bg-slate-50 p-6 sm:grid-cols-2 lg:grid-cols-3">
         {compounds.map((compound) => (
           <CompoundCard
             key={compound.id}
